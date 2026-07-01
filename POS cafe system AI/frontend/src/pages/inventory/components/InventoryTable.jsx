@@ -1,4 +1,3 @@
-import React from 'react';
 import { Icons } from '../../../assets/icons';
 import { inventoryItems } from '../inventoryData';
 
@@ -33,7 +32,7 @@ const SortMark = () => (
   </span>
 );
 
-const InventoryTable = () => {
+const InventoryTable = ({ onAddItem }) => {
   return (
     <section className="flex-1 min-h-0 bg-white rounded-[6px] border border-[var(--color-border)] shadow-[0_1px_2px_rgba(3,4,90,0.04)] mt-[12px] px-[17px] pt-[16px] pb-[16px] flex flex-col">
       <div className="flex items-start justify-between shrink-0">
@@ -43,7 +42,11 @@ const InventoryTable = () => {
         </div>
 
         <div className="flex gap-[10px]">
-          <button className="h-[38px] px-[16px] rounded-[6px] border border-[#deddf6] bg-[var(--color-primary-soft)] text-[var(--color-primary)] flex items-center gap-[7px] text-[12px] font-semibold">
+          <button
+            type="button"
+            onClick={onAddItem}
+            className="h-[38px] px-[16px] rounded-[6px] border border-[#deddf6] bg-[var(--color-primary-soft)] text-[var(--color-primary)] flex items-center gap-[7px] text-[12px] font-semibold"
+          >
             <Icons.Plus className="text-[15px]" />
             Add Item
           </button>

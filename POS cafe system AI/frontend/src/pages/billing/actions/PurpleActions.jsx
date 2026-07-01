@@ -1,7 +1,7 @@
 import React from 'react';
 import { Icons } from '../../../assets/icons';
 
-const PurpleActions = ({ onNewBill }) => {
+const PurpleActions = ({ onNewBill, onPriceAmendmentClick }) => {
   return (
     <div className="h-full flex bg-[var(--color-purple-action)] text-white rounded-[4px] overflow-hidden">
       <button
@@ -13,7 +13,11 @@ const PurpleActions = ({ onNewBill }) => {
         <span className="text-[10px] font-semibold leading-[11px]">New Bill</span>
       </button>
 
-      <button className="w-[113px] flex flex-col items-center justify-center hover:bg-[#7435dc] border-r border-[var(--color-purple-action-border)] transition-colors">
+      <button 
+        type="button"
+        onClick={onPriceAmendmentClick}
+        className="w-[113px] flex flex-col items-center justify-center hover:bg-[#7435dc] border-r border-[var(--color-purple-action-border)] transition-colors"
+      >
         <Icons.PriceAmendment className="text-[27px] mb-[9px]" />
         <span className="text-[10px] font-semibold leading-[11px]">Price Amendment</span>
       </button>

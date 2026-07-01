@@ -7,9 +7,11 @@ import MenuGrid from './MenuGrid';
 import PurpleActions from './actions/PurpleActions';
 import TealActions from './actions/TealActions';
 import OrangeActions from './actions/OrangeActions';
+import PriceAmendment from './PriceAmendment';
 
 const BillingLayout = () => {
   const [billItems, setBillItems] = useState([]);
+  const [showPriceAmendment, setShowPriceAmendment] = useState(false);
 
   const subtotal = useMemo(
     () => billItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
@@ -80,7 +82,15 @@ const BillingLayout = () => {
 
       <div className="flex-1 flex gap-[11px] min-h-0">
         <div className="w-[500px] flex flex-col gap-[12px]">
-          <CurrentBill items={billItems} onRemoveItem={handleRemoveItem} />
+          {showPriceAmendment ? (
+            <PriceAmendment
+              totalAmount={subtotal}
+              gstAmount={totalAmount - subtotal}
+              payable={totalAmount}
+            />
+          ) : (
+            <CurrentBill items={billItems} onRemoveItem={handleRemoveItem} />
+          )}
           <NumpadInput />
         </div>
 
@@ -95,7 +105,10 @@ const BillingLayout = () => {
 
       <div className="h-[104px] grid grid-cols-[500px_233px_1fr] gap-[11px] shrink-0 mt-[11px]">
         <div>
-          <PurpleActions onNewBill={() => setBillItems([])} />
+          <PurpleActions 
+            onNewBill={() => { setBillItems([]); setShowPriceAmendment(false); }} 
+            onPriceAmendmentClick={() => setShowPriceAmendment(true)} 
+          />
         </div>
         <div>
           <TealActions />

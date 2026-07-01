@@ -1,14 +1,20 @@
-import React from 'react';
 import { Icons } from '../../../assets/icons';
 
-const InventoryTopBar = () => {
+const InventoryTopBar = ({ isAddingItem = false }) => {
   return (
     <header className="h-[76px] flex items-center justify-between shrink-0">
       <div className="flex items-center gap-[18px] pl-[8px]">
         <button className="text-[var(--color-text)] hover:bg-white w-[28px] h-[28px] rounded-[5px] flex items-center justify-center">
           <Icons.Menu className="text-[20px]" />
         </button>
-        <h1 className="text-[22px] font-semibold text-black leading-none">inventory</h1>
+        <div>
+          <h1 className="text-[22px] font-semibold text-black leading-none">inventory</h1>
+          {isAddingItem && (
+            <p className="mt-[8px] text-[12px] leading-[14px] font-semibold text-[var(--color-primary)]">
+              inventory &gt; Add inventory
+            </p>
+          )}
+        </div>
       </div>
 
       <div className="flex items-center h-[42px] rounded-[6px] bg-white border border-[#deddf6] text-[var(--color-text)] mr-[4px] shadow-[0_1px_2px_rgba(3,4,90,0.04)]">
