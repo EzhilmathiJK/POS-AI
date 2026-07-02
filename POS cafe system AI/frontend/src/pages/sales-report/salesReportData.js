@@ -1,0 +1,23 @@
+export const salesReports = [
+  { itemName: 'BBQ Bun', soldQuantity: 1, totalPrice: '\u20b950.00' },
+  { itemName: 'Black Coffee', soldQuantity: 12, totalPrice: '\u20b9180.00' },
+  { itemName: 'Black Tea', soldQuantity: 2, totalPrice: '\u20b940.00' },
+  { itemName: 'Bubble Tea', soldQuantity: 2, totalPrice: '\u20b9160.00' },
+  { itemName: 'Cold Coffee', soldQuantity: 2, totalPrice: '\u20b940.00' },
+  { itemName: 'Ginger Tea', soldQuantity: 3, totalPrice: '\u20b972.00' },
+  { itemName: 'Iced Tea', soldQuantity: 6, totalPrice: '\u20b9300.00' },
+  { itemName: 'Milk', soldQuantity: 7, totalPrice: '\u20b9140.00' },
+  { itemName: 'Milo', soldQuantity: 4, totalPrice: '\u20b9240.00' },
+  { itemName: 'Steamed Bun', soldQuantity: 5, totalPrice: '\u20b9250.00' },
+  { itemName: 'Chicken Momo', soldQuantity: 3, totalPrice: '\u20b9270.00' },
+  { itemName: 'Veg Noodles', soldQuantity: 8, totalPrice: '\u20b9640.00' },
+  { itemName: 'Fried Rice', soldQuantity: 6, totalPrice: '\u20b9720.00' },
+  { itemName: 'Spring Roll', soldQuantity: 4, totalPrice: '\u20b9320.00' },
+  { itemName: 'Lemon Tea', soldQuantity: 8, totalPrice: '\u20b9280.00' },
+  { itemName: 'Masala Tea', soldQuantity: 5, totalPrice: '\u20b9150.00' },
+  { itemName: 'Chocolate Bun', soldQuantity: 3, totalPrice: '\u20b9180.00' },
+  { itemName: 'Paneer Roll', soldQuantity: 2, totalPrice: '\u20b9220.00' },
+  { itemName: 'Corn Soup', soldQuantity: 4, totalPrice: '\u20b9260.00' },
+  { itemName: 'Veg Sandwich', soldQuantity: 6, totalPrice: '\u20b9360.00' },
+];
+

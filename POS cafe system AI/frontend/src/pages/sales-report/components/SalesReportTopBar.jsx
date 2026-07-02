@@ -1,6 +1,6 @@
 import { Icons } from '../../../assets/icons';
 
-const ItemRequestTopBar = ({ isAddingRequest = false, subViewTitle = '' }) => {
+const SalesReportTopBar = ({ isSubView = false, subViewTitle = '' }) => {
   return (
     <header className="h-[76px] flex items-center justify-between shrink-0">
       <div className="flex items-center gap-[18px] pl-[8px]">
@@ -8,10 +8,10 @@ const ItemRequestTopBar = ({ isAddingRequest = false, subViewTitle = '' }) => {
           <Icons.Menu className="text-[20px]" />
         </button>
         <div>
-          <h1 className="text-[22px] font-bold text-black leading-none">Item Request</h1>
-          {isAddingRequest && (
+          <h1 className="text-[22px] font-bold text-black leading-none">Sales Report</h1>
+          {isSubView && (
             <p className="mt-[8px] text-[12px] leading-[14px] font-semibold text-[var(--color-primary)]">
-              Item Request &gt; {subViewTitle || 'Add Item Request'}
+              Sales Report &gt; {subViewTitle}
             </p>
           )}
         </div>
@@ -21,17 +21,18 @@ const ItemRequestTopBar = ({ isAddingRequest = false, subViewTitle = '' }) => {
         <div className="h-full flex items-center gap-[9px] pl-[12px] pr-[17px] border-r border-[#e4e2fa]">
           <Icons.Calendar className="text-[17px] text-[var(--color-primary)]" />
           <div className="text-[12px] font-semibold leading-[14px]">
-            <div>01 Jul 2026</div>
-            <div>Wednesday</div>
+            <div>02 Jul 2026</div>
+            <div>Thursday</div>
           </div>
         </div>
         <div className="h-full flex items-center gap-[9px] pl-[15px] pr-[17px]">
           <Icons.Clock className="text-[17px] text-[var(--color-primary)]" />
-          <span className="text-[12px] font-semibold">{isAddingRequest ? '08:53 PM' : '08:43 PM'}</span>
+          <span className="text-[12px] font-semibold">12:58 PM</span>
         </div>
       </div>
     </header>
   );
 };
 
-export default ItemRequestTopBar;
+export default SalesReportTopBar;
+

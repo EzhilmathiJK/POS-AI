@@ -28,17 +28,20 @@ const TextInput = ({ placeholder, value, readOnly = false, suffix }) => (
   </div>
 );
 
-const SelectInput = ({ placeholder, value }) => (
-  <button
-    type="button"
-    style={{ fontSize: '12px', fontWeight: 400 }}
-    className={`w-full h-[37px] rounded-[7px] border border-[#deddf6] bg-white px-[14px] outline-none flex items-center justify-between ${
-      value ? 'text-[var(--color-primary)]' : 'text-[#9b8fd6]'
-    }`}
-  >
-    <span>{value || placeholder}</span>
-    <Icons.ChevronDown className="text-[15px]" />
-  </button>
+const SelectInput = ({ placeholder, value, options }) => (
+  <div className="relative">
+    <select
+      defaultValue={value || ''}
+      style={{ fontSize: '12px', fontWeight: 400 }}
+      className="w-full h-[37px] appearance-none rounded-[7px] border border-[#deddf6] bg-white pl-[14px] pr-[36px] text-[var(--color-primary)] invalid:text-[#9b8fd6] outline-none focus:border-[var(--color-primary)] cursor-pointer"
+    >
+      <option value="" disabled hidden>{placeholder}</option>
+      {options.map((option) => (
+        <option key={option} value={option}>{option}</option>
+      ))}
+    </select>
+    <Icons.ChevronDown className="absolute right-[14px] top-[12px] text-[15px] text-[var(--color-primary)] pointer-events-none" />
+  </div>
 );
 
 const TextArea = ({ placeholder }) => (
@@ -94,7 +97,7 @@ const AddInventoryForm = ({ onCancel }) => {
 
             <label>
               <FieldLabel required>Category</FieldLabel>
-              <SelectInput placeholder="Select category" />
+              <SelectInput placeholder="Select category" options={['Beverage', 'Steamed Bun', 'Dimsum', 'Deep Fry', 'Bake', 'Noodles', 'Porridge']} />
             </label>
 
             <label>
@@ -104,7 +107,7 @@ const AddInventoryForm = ({ onCancel }) => {
 
             <label>
               <FieldLabel required>Unit</FieldLabel>
-              <SelectInput placeholder="Select unit" />
+              <SelectInput placeholder="Select unit" options={['Cup', 'Plate', 'Piece', 'Bowl', 'Pack']} />
             </label>
 
             <label>
@@ -122,7 +125,7 @@ const AddInventoryForm = ({ onCancel }) => {
 
             <label>
               <FieldLabel>Supplier</FieldLabel>
-              <SelectInput placeholder="Select supplier" />
+              <SelectInput placeholder="Select supplier" options={['Cafe Supplier', 'Daily Fresh', 'Main Store', 'Local Vendor']} />
             </label>
           </div>
 

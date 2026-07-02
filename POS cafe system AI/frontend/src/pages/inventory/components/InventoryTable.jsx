@@ -32,6 +32,21 @@ const SortMark = () => (
   </span>
 );
 
+const EntriesSelect = () => (
+  <div className="relative h-[27px] w-[47px]">
+    <select
+      defaultValue="10"
+      aria-label="Inventory entries per page"
+      className="w-full h-full appearance-none rounded-[5px] border border-[var(--color-border)] bg-[#fbfbfd] pl-[11px] pr-[18px] text-[var(--color-text)] font-semibold outline-none focus:border-[var(--color-primary)] cursor-pointer"
+    >
+      <option value="5">5</option>
+      <option value="10">10</option>
+      <option value="20">20</option>
+    </select>
+    <Icons.ChevronDown className="absolute right-[7px] top-[9px] text-[10px] text-[#b2b5c2] pointer-events-none" />
+  </div>
+);
+
 const InventoryTable = ({ onAddItem }) => {
   return (
     <section className="flex-1 min-h-0 bg-white rounded-[6px] border border-[var(--color-border)] shadow-[0_1px_2px_rgba(3,4,90,0.04)] mt-[12px] px-[17px] pt-[16px] pb-[16px] flex flex-col">
@@ -106,10 +121,7 @@ const InventoryTable = ({ onAddItem }) => {
       <div className="h-[42px] pt-[14px] grid grid-cols-3 items-start shrink-0 text-[12px] text-[var(--color-primary)]">
         <div className="flex items-center gap-[7px] font-semibold">
           <span>Show</span>
-          <button className="h-[27px] w-[47px] rounded-[5px] border border-[var(--color-border)] bg-[#fbfbfd] flex items-center justify-center gap-[5px] text-[var(--color-text)] font-semibold">
-            10
-            <Icons.ChevronDown className="text-[10px] text-[#b2b5c2]" />
-          </button>
+          <EntriesSelect />
           <span>entries</span>
         </div>
 

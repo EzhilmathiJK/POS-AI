@@ -9,7 +9,7 @@ const ItemRequestLayout = () => {
 
   return (
     <div className="flex flex-col h-full bg-[var(--color-app-bg)] px-[13px] pb-[12px]">
-      <ItemRequestTopBar isAddingRequest={isAddingRequest} />
+      <ItemRequestTopBar isAddingRequest={isAddingRequest} subViewTitle="Add Item Request" />
       {isAddingRequest ? (
         <NewItemRequestForm onCancel={() => setIsAddingRequest(false)} />
       ) : (
