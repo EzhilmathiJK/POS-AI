@@ -6,7 +6,7 @@ const CurrentBill = ({ items = [], onRemoveItem }) => {
 
   return (
     <div className="bg-white rounded-[7px] flex-1 flex flex-col min-h-0">
-      <div className="grid grid-cols-[1fr_70px_100px_90px_24px] text-[11px] font-semibold text-[var(--color-text)] px-[12px] pt-[17px] pb-[12px] border-b border-[var(--color-border)]">
+      <div className="grid grid-cols-[1fr_70px_100px_90px_24px] text-[12px] font-semibold text-[var(--color-text)] px-[12px] pt-[17px] pb-[12px] border-b border-[var(--color-border)]">
         <div>Item</div>
         <div className="text-center">Qty</div>
         <div className="text-center">Unit Price</div>
@@ -26,7 +26,7 @@ const CurrentBill = ({ items = [], onRemoveItem }) => {
                   <div className="w-[32px] h-[32px] rounded-[5px] bg-[#f6f7fb] flex items-center justify-center shrink-0 overflow-hidden">
                     <img src={item.image} alt={item.name} className="max-w-[26px] max-h-[27px] object-contain" />
                   </div>
-                  <span className="font-semibold text-[var(--color-text)] truncate">{item.name}</span>
+                  <span className="font-semibold text-[12px] text-[var(--color-text)] truncate">{item.name}</span>
                 </div>
 
                 <div className="flex justify-center">
@@ -35,8 +35,8 @@ const CurrentBill = ({ items = [], onRemoveItem }) => {
                   </span>
                 </div>
 
-                <div className="text-center font-semibold">₹{item.price.toFixed(2)}</div>
-                <div className="text-center font-semibold">₹{(item.price * item.quantity).toFixed(2)}</div>
+                <div className="text-center font-normal">₹{item.price.toFixed(2)}</div>
+                <div className="text-center font-normal">₹{(item.price * item.quantity).toFixed(2)}</div>
                 <button
                   type="button"
                   onClick={() => onRemoveItem?.(item.id)}
@@ -65,8 +65,8 @@ const CurrentBill = ({ items = [], onRemoveItem }) => {
           <div className="w-[50px] h-[50px] bg-[var(--color-primary-soft)] rounded-full flex items-center justify-center mb-[12px]">
             <Icons.Billing className="text-[21px] text-[#8c89b8]" />
           </div>
-          <p className="text-[14px] leading-[17px] text-[var(--color-text)] font-semibold mb-[7px]">No items added yet</p>
-          <p className="text-[11px] leading-[14px] text-[var(--color-muted)]">Select items from the menu to add to the bill.</p>
+          <p className="text-[13px] leading-[17px] text-[var(--color-text)] font-semibold mb-[7px]">No items added yet</p>
+          <p className="text-[12px] leading-[14px] font-normal text-[var(--color-muted)]">Select items from the menu to add to the bill.</p>
         </div>
       )}
     </div>

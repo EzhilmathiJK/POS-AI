@@ -1,4 +1,3 @@
-import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { Icons } from '../../assets/icons';
 
@@ -46,10 +45,10 @@ const Sidebar = () => {
           <Icons.Help className="text-[15px] shrink-0" />
           <span className="font-bold text-[12px] leading-none">Help & Support</span>
         </a>
-        <a href="#" className="flex items-center gap-[14px] h-[35px] px-[23px] rounded-[6px] text-white hover:bg-[#20235a] transition-colors">
+        <NavLink to="/login" className="flex items-center gap-[14px] h-[35px] px-[23px] rounded-[6px] text-white hover:bg-[#20235a] transition-colors">
           <Icons.Logout className="text-[15px] shrink-0" />
           <span className="font-bold text-[12px] leading-none">Logout</span>
-        </a>
+        </NavLink>
       </div>
 
       <div className="h-[71px] px-[24px] flex items-center gap-[11px]">

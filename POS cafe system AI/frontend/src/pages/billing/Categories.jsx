@@ -16,8 +16,8 @@ const Categories = () => {
   ];
 
   return (
-    <div className="w-[172px] h-full bg-white rounded-[7px] px-[14px] pt-[16px] overflow-y-auto custom-scrollbar">
-      <div className="space-y-[12px]">
+    <div className="w-[172px] h-full bg-white rounded-[7px] px-[12px] pt-[16px] overflow-y-auto custom-scrollbar">
+      <div className="space-y-[10px]">
         {categories.map((cat) => {
           const isActive = activeCategory === cat.name;
           return (
@@ -31,7 +31,7 @@ const Categories = () => {
               }`}
             >
               <cat.icon className={`text-[18px] shrink-0 ${isActive ? 'text-white' : 'text-[var(--color-text)]'}`} />
-              <span className="text-[12px] font-semibold tracking-wide leading-tight">{cat.name}</span>
+              <span className="text-[11.5px] font-semibold tracking-wide leading-tight">{cat.name}</span>
             </button>
           );
         })}

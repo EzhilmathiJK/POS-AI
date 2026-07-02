@@ -29,8 +29,8 @@ const PurpleActions = ({ onNewBill, onPriceAmendmentClick }) => {
         <button className="hover:bg-[#7435dc] flex items-center justify-center">₹50</button>
       </div>
 
-      <div className="flex-1 flex flex-col border-l border-[var(--color-purple-action-border)]">
-        <button className="flex-1 border-b border-[var(--color-purple-action-border)] hover:bg-[#7435dc] flex items-center justify-center font-semibold text-[14px]">₹10</button>
+      <div className="flex-1 flex flex-col border-l border-[var(--color-purple-action-border)] text-[14px] font-semibold text-center">
+        <button className="flex-1 border-b border-[var(--color-purple-action-border)] hover:bg-[#7435dc] flex items-center justify-center">₹10</button>
         <button className="flex-1 flex flex-col items-center justify-center hover:bg-[#7435dc] transition-colors">
           <Icons.GiftVoucher className="text-[18px] mb-[2px]" />
           <span className="text-[9px] font-semibold leading-[10px]">Gift Voucher</span>

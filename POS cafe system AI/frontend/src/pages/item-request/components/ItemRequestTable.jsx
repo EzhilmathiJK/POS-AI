@@ -1,0 +1,139 @@
+import { Icons } from '../../../assets/icons';
+import { itemRequests } from '../itemRequestData';
+
+const columns = [
+  'Request ID',
+  'Subject',
+  'Requested By',
+  'Requested Date',
+  'Expecting Delivery',
+  'Status',
+  'Action',
+];
+
+const statusClasses = {
+  Received: 'bg-[#dff8e6] text-[#00a711]',
+  Cancelled: 'bg-[#ffe4e7] text-[#ff1e27]',
+  Pending: 'bg-[#fff0df] text-[#ff5f00]',
+  'On The Way': 'bg-[#e8f1ff] text-[#1f64ff]',
+};
+
+const SortMark = () => (
+  <span className="inline-flex flex-col ml-[5px] align-middle translate-y-[1px]">
+    <span className="w-0 h-0 border-l-[3px] border-r-[3px] border-b-[4px] border-l-transparent border-r-transparent border-b-[#9da5b3]" />
+    <span className="w-0 h-0 border-l-[3px] border-r-[3px] border-t-[4px] border-l-transparent border-r-transparent border-t-[#9da5b3] mt-[1px]" />
+  </span>
+);
+
+const ItemRequestTable = ({ onNewItemRequest }) => {
+  return (
+    <section className="flex-1 min-h-0 bg-white rounded-[6px] border border-[var(--color-border)] shadow-[0_1px_2px_rgba(3,4,90,0.04)] mt-[12px] px-[14px] pt-[16px] pb-[16px] flex flex-col">
+      <div className="flex items-start justify-between shrink-0 px-[6px]">
+        <div>
+          <h2 className="text-[13px] leading-[19px] font-semibold text-[var(--color-text)]">Item Request List</h2>
+          <p className="text-[12px] leading-[18px] font-normal text-[var(--color-primary)]">Total 10 requests</p>
+        </div>
+
+        <div className="flex gap-[10px]">
+          <button
+            type="button"
+            onClick={onNewItemRequest}
+            style={{ fontSize: '14px' }}
+            className="h-[36px] px-[16px] rounded-[6px] bg-[var(--color-primary)] text-white flex items-center gap-[7px] font-bold hover:bg-[var(--color-primary-hover)]"
+          >
+            <Icons.Plus className="text-[14px]" />
+            New Item Request
+          </button>
+          <button style={{ fontSize: '14px' }} className="h-[36px] px-[16px] rounded-[6px] border border-[#deddf6] bg-white text-[var(--color-text)] flex items-center gap-[7px] font-bold hover:bg-gray-50">
+            <Icons.FileExcel className="text-[14px]" />
+            Export to Excel
+          </button>
+        </div>
+      </div>
+
+      <div className="mt-[18px] border border-[#deddf6] rounded-[7px] overflow-hidden flex-1 min-h-0 relative">
+        <div className="h-full overflow-y-auto custom-scrollbar inventory-table-scroll">
+          <table className="w-full table-fixed border-collapse text-[12px] text-[var(--color-primary)]">
+            <colgroup>
+              <col style={{ width: '14%' }} />
+              <col style={{ width: '20%' }} />
+              <col style={{ width: '13%' }} />
+              <col style={{ width: '16%' }} />
+              <col style={{ width: '16%' }} />
+              <col style={{ width: '12%' }} />
+              <col style={{ width: '9%' }} />
+            </colgroup>
+            <thead className="sticky top-0 z-10">
+              <tr className="h-[50px] bg-[#f7f6ff] border-b border-[#deddf6]">
+                {columns.map((column) => (
+                  <th
+                    key={column}
+                    className="font-semibold text-[13px] text-[var(--color-text)] px-[14px] text-left whitespace-nowrap overflow-hidden text-ellipsis"
+                  >
+                    {column}
+                    <SortMark />
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {itemRequests.map((request) => (
+                <tr key={request.id} className="h-[64px] border-b border-[#deddf6] last:border-b-0">
+                  <td className="px-[14px] font-normal overflow-hidden text-ellipsis whitespace-nowrap">{request.id}</td>
+                  <td className="px-[14px] font-normal overflow-hidden text-ellipsis whitespace-nowrap">{request.subject}</td>
+                  <td className="px-[14px] font-normal overflow-hidden text-ellipsis whitespace-nowrap">{request.requestedBy}</td>
+                  <td className="px-[14px] font-normal">
+                    <div className="truncate">{request.requestedDate}</div>
+                    <div className="mt-[3px] truncate">{request.requestedTime}</div>
+                  </td>
+                  <td className="px-[14px] font-normal overflow-hidden text-ellipsis whitespace-nowrap">{request.expectedDelivery}</td>
+                  <td className="px-[14px] font-normal">
+                    <span className={`inline-flex items-center justify-center h-[22px] rounded-[5px] px-[10px] text-[11px] font-semibold ${statusClasses[request.status]}`}>
+                      {request.status}
+                    </span>
+                  </td>
+                  <td className="px-[14px] font-normal">
+                    <button className="w-[28px] h-[28px] rounded-[6px] text-[var(--color-primary)] hover:bg-[var(--color-primary-soft)] flex items-center justify-center" aria-label={`View ${request.id}`}>
+                      <Icons.Eye className="text-[14px]" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div className="h-[42px] pt-[14px] grid grid-cols-3 items-start shrink-0 text-[12px] text-[var(--color-primary)] px-[6px]">
+        <div className="flex items-center gap-[7px] font-semibold">
+          <span>Show</span>
+          <button className="h-[27px] w-[47px] rounded-[5px] border border-[var(--color-border)] bg-[#fbfbfd] flex items-center justify-center gap-[5px] text-[var(--color-text)] font-semibold">
+            10
+            <Icons.ChevronDown className="text-[10px] text-[#b2b5c2]" />
+          </button>
+          <span>entries</span>
+        </div>
+
+        <div className="flex justify-center gap-[5px]">
+          <button className="w-[28px] h-[28px] rounded-[7px] border border-[var(--color-border)] text-[#b9bdcb] flex items-center justify-center">
+            <Icons.First className="text-[14px]" />
+          </button>
+          <button className="w-[28px] h-[28px] rounded-[7px] border border-[var(--color-border)] text-[#b9bdcb] flex items-center justify-center">
+            <Icons.Prev className="text-[14px]" />
+          </button>
+          <button className="w-[30px] h-[30px] rounded-[7px] bg-[var(--color-primary)] text-white font-semibold">1</button>
+          <button className="w-[28px] h-[28px] rounded-[7px] border border-[var(--color-border)] text-[#b9bdcb] flex items-center justify-center">
+            <Icons.Next className="text-[14px]" />
+          </button>
+          <button className="w-[28px] h-[28px] rounded-[7px] border border-[var(--color-border)] text-[#b9bdcb] flex items-center justify-center">
+            <Icons.Last className="text-[14px]" />
+          </button>
+        </div>
+
+        <p className="text-right font-semibold text-[12px] leading-[28px]">Showing 1 to 10 of 10 requests</p>
+      </div>
+    </section>
+  );
+};
+
+export default ItemRequestTable;

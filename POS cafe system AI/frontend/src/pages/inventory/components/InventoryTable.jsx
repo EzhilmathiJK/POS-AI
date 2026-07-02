@@ -37,25 +37,26 @@ const InventoryTable = ({ onAddItem }) => {
     <section className="flex-1 min-h-0 bg-white rounded-[6px] border border-[var(--color-border)] shadow-[0_1px_2px_rgba(3,4,90,0.04)] mt-[12px] px-[17px] pt-[16px] pb-[16px] flex flex-col">
       <div className="flex items-start justify-between shrink-0">
         <div>
-          <h2 className="text-[16px] leading-[19px] font-semibold text-[var(--color-text)]">Inventory List</h2>
-          <p className="text-[13px] leading-[18px] font-medium text-[var(--color-primary)]">Total 10 items found</p>
+          <h2 className="text-[13px] leading-[19px] font-semibold text-[var(--color-text)]">Inventory List</h2>
+          <p className="text-[12px] leading-[18px] font-normal text-[var(--color-primary)]">Total 10 items found</p>
         </div>
 
         <div className="flex gap-[10px]">
           <button
             type="button"
             onClick={onAddItem}
-            className="h-[38px] px-[16px] rounded-[6px] border border-[#deddf6] bg-[var(--color-primary-soft)] text-[var(--color-primary)] flex items-center gap-[7px] text-[12px] font-semibold"
+            style={{ fontSize: '14px' }}
+            className="h-[38px] px-[16px] rounded-[6px] border border-[#deddf6] bg-[var(--color-primary-soft)] text-[var(--color-primary)] flex items-center gap-[7px] font-bold"
           >
-            <Icons.Plus className="text-[15px]" />
+            <Icons.Plus className="text-[14px]" />
             Add Item
           </button>
-          <button className="h-[38px] px-[16px] rounded-[6px] bg-[var(--color-primary)] text-white flex items-center gap-[7px] text-[12px] font-semibold hover:bg-[var(--color-primary-hover)]">
-            <Icons.Download className="text-[16px]" />
+          <button style={{ fontSize: '14px' }} className="h-[38px] px-[16px] rounded-[6px] bg-[var(--color-primary)] text-white flex items-center gap-[7px] font-bold hover:bg-[var(--color-primary-hover)]">
+            <Icons.Download className="text-[14px]" />
             Request Item
           </button>
-          <button className="h-[38px] px-[16px] rounded-[6px] border border-[#deddf6] bg-white text-[var(--color-text)] flex items-center gap-[7px] text-[12px] font-semibold">
-            <Icons.FileExcel className="text-[16px]" />
+          <button style={{ fontSize: '14px' }} className="h-[38px] px-[16px] rounded-[6px] border border-[#deddf6] bg-white text-[var(--color-text)] flex items-center gap-[7px] font-bold">
+            <Icons.FileExcel className="text-[14px]" />
             Export to Excel
           </button>
         </div>
@@ -63,7 +64,7 @@ const InventoryTable = ({ onAddItem }) => {
 
       <div className="mt-[14px] border border-[#deddf6] rounded-[7px] overflow-hidden flex-1 min-h-0 relative">
         <div className="h-full overflow-y-auto custom-scrollbar inventory-table-scroll">
-          <table className="w-full border-collapse text-[13px] text-[var(--color-text)]">
+          <table className="w-full border-collapse text-[12px] text-[var(--color-text)]">
             <thead className="sticky top-0 z-10">
               <tr className="h-[50px] bg-[#f7f6ff] border-b border-[#deddf6]">
                 {columns.map((column) => (
@@ -114,21 +115,21 @@ const InventoryTable = ({ onAddItem }) => {
 
         <div className="flex justify-center gap-[5px]">
           <button className="w-[28px] h-[28px] rounded-[7px] border border-[var(--color-border)] text-[#b9bdcb] flex items-center justify-center">
-            <Icons.First className="text-[15px]" />
+            <Icons.First className="text-[14px]" />
           </button>
           <button className="w-[28px] h-[28px] rounded-[7px] border border-[var(--color-border)] text-[#b9bdcb] flex items-center justify-center">
-            <Icons.Prev className="text-[15px]" />
+            <Icons.Prev className="text-[14px]" />
           </button>
           <button className="w-[30px] h-[30px] rounded-[7px] bg-[var(--color-primary)] text-white font-semibold">1</button>
           <button className="w-[28px] h-[28px] rounded-[7px] border border-[var(--color-border)] text-[#b9bdcb] flex items-center justify-center">
-            <Icons.Next className="text-[15px]" />
+            <Icons.Next className="text-[14px]" />
           </button>
           <button className="w-[28px] h-[28px] rounded-[7px] border border-[var(--color-border)] text-[#b9bdcb] flex items-center justify-center">
-            <Icons.Last className="text-[15px]" />
+            <Icons.Last className="text-[14px]" />
           </button>
         </div>
 
-        <p className="text-right font-semibold leading-[28px]">Showing 1 to 10 of 10 entries</p>
+        <p className="text-right font-semibold text-[12px] leading-[28px]">Showing 1 to 10 of 10 entries</p>
       </div>
     </section>
   );

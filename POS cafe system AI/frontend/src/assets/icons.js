@@ -4,10 +4,11 @@ import {
   FiRotateCcw, FiHome, FiPlus, FiMinus, FiDelete, FiXCircle, FiShoppingCart,
   FiBox, FiTag, FiCalendar, FiChevronDown, FiFilter, FiRefreshCw,
   FiDownload, FiUpload, FiChevronLeft, FiChevronRight, FiChevronsLeft,
-  FiChevronsRight, FiInfo, FiSave
+  FiChevronsRight, FiInfo, FiSave, FiEye, FiSend, FiUser, FiLock,
+  FiEyeOff, FiShield, FiCheck, FiMail
 } from 'react-icons/fi';
 import { MdOutlineFastfood, MdOutlineRamenDining, MdOutlineRiceBowl } from 'react-icons/md';
-import { BiCoffeeTogo, BiFoodMenu, BiReceipt } from 'react-icons/bi';
+import { BiCoffeeTogo, BiReceipt } from 'react-icons/bi';
 import { BsCashCoin, BsGift, BsCupHot } from 'react-icons/bs';
 import { GiCampCookingPot } from 'react-icons/gi';
 
@@ -38,11 +39,19 @@ export const Icons = {
   Download: FiDownload,
   Upload: FiUpload,
   Save: FiSave,
+  Send: FiSend,
   Prev: FiChevronLeft,
   Next: FiChevronRight,
   First: FiChevronsLeft,
   Last: FiChevronsRight,
   Info: FiInfo,
+  Eye: FiEye,
+  EyeOff: FiEyeOff,
+  User: FiUser,
+  Lock: FiLock,
+  Shield: FiShield,
+  Check: FiCheck,
+  Mail: FiMail,
 
   // Categories
   Beverage: FiCoffee,

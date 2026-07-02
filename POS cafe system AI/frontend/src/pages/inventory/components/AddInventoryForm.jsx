@@ -15,7 +15,8 @@ const TextInput = ({ placeholder, value, readOnly = false, suffix }) => (
       placeholder={placeholder}
       value={value}
       readOnly={readOnly}
-      className={`w-full h-[37px] rounded-[7px] border border-[#deddf6] px-[12px] text-[12px] font-semibold text-[var(--color-primary)] outline-none focus:border-[var(--color-primary)] ${
+      style={{ fontSize: '12px', fontWeight: 400 }}
+      className={`w-full h-[37px] rounded-[7px] border border-[#deddf6] px-[12px] text-[var(--color-primary)] placeholder:text-[#9b8fd6] outline-none focus:border-[var(--color-primary)] ${
         readOnly ? 'bg-[#f4f4f7]' : 'bg-white'
       } ${suffix ? 'pr-[56px]' : ''}`}
     />
@@ -27,12 +28,15 @@ const TextInput = ({ placeholder, value, readOnly = false, suffix }) => (
   </div>
 );
 
-const SelectInput = ({ placeholder }) => (
+const SelectInput = ({ placeholder, value }) => (
   <button
     type="button"
-    className="w-full h-[37px] rounded-[7px] border border-[#deddf6] bg-white px-[14px] text-[12px] font-semibold text-[var(--color-primary)] outline-none flex items-center justify-between"
+    style={{ fontSize: '12px', fontWeight: 400 }}
+    className={`w-full h-[37px] rounded-[7px] border border-[#deddf6] bg-white px-[14px] outline-none flex items-center justify-between ${
+      value ? 'text-[var(--color-primary)]' : 'text-[#9b8fd6]'
+    }`}
   >
-    <span>{placeholder}</span>
+    <span>{value || placeholder}</span>
     <Icons.ChevronDown className="text-[15px]" />
   </button>
 );
@@ -40,7 +44,8 @@ const SelectInput = ({ placeholder }) => (
 const TextArea = ({ placeholder }) => (
   <textarea
     placeholder={placeholder}
-    className="w-full h-[115px] resize-none rounded-[9px] border border-[#deddf6] bg-white px-[12px] py-[12px] text-[12px] font-semibold text-[var(--color-primary)] outline-none focus:border-[var(--color-primary)]"
+    style={{ fontSize: '12px', fontWeight: 400 }}
+    className="w-full h-[115px] resize-none rounded-[9px] border border-[#deddf6] bg-white px-[12px] py-[12px] text-[var(--color-primary)] placeholder:text-[#9b8fd6] outline-none focus:border-[var(--color-primary)]"
   />
 );
 
@@ -125,13 +130,15 @@ const AddInventoryForm = ({ onCancel }) => {
             <button
               type="button"
               onClick={onCancel}
-              className="h-[36px] min-w-[102px] rounded-[7px] border border-[#deddf6] bg-white px-[24px] text-[13px] font-semibold text-[var(--color-text)] hover:bg-gray-50"
+              style={{ fontSize: '14px' }}
+              className="h-[36px] min-w-[102px] rounded-[7px] border border-[#deddf6] bg-white px-[24px] font-bold text-[var(--color-text)] hover:bg-gray-50"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="h-[36px] min-w-[116px] rounded-[7px] bg-[var(--color-primary)] px-[24px] text-[13px] font-semibold text-white flex items-center justify-center gap-[10px] hover:bg-[var(--color-primary-hover)]"
+              style={{ fontSize: '14px' }}
+              className="h-[36px] min-w-[116px] rounded-[7px] bg-[var(--color-primary)] px-[24px] font-bold text-white flex items-center justify-center gap-[10px] hover:bg-[var(--color-primary-hover)]"
             >
               <Icons.Save className="text-[16px]" />
               Save
