@@ -47,7 +47,7 @@ const EntriesSelect = () => (
   </div>
 );
 
-const InventoryTable = ({ onAddItem }) => {
+const InventoryTable = ({ onAddItem, onEditItem }) => {
   return (
     <section className="flex-1 min-h-0 bg-white rounded-[6px] border border-[var(--color-border)] shadow-[0_1px_2px_rgba(3,4,90,0.04)] mt-[12px] px-[17px] pt-[16px] pb-[16px] flex flex-col">
       <div className="flex items-start justify-between shrink-0">
@@ -96,7 +96,12 @@ const InventoryTable = ({ onAddItem }) => {
                   <td className="px-[18px] font-normal whitespace-nowrap">
                     <div className="flex items-center gap-[13px]">
                       <img src={item.image} alt={item.name} className="w-[18px] h-[22px] object-contain shrink-0" />
-                      <span>{item.name}</span>
+                      <button 
+                        onClick={() => onEditItem(item)}
+                        className="text-[var(--color-text)] hover:underline hover:text-[var(--color-primary)] cursor-pointer"
+                      >
+                        {item.name}
+                      </button>
                     </div>
                   </td>
                   <td className="px-[18px] font-normal text-[var(--color-primary)] whitespace-nowrap">{item.category}</td>

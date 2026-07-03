@@ -1,8 +1,11 @@
 import { NavLink } from 'react-router-dom';
 import { Icons } from '../../assets/icons';
+import { useAppContext } from '../../context/AppContext';
 
 const Sidebar = () => {
-  const navItems = [
+  const { rolePermissions, currentUser } = useAppContext();
+
+  const allNavItems = [
     { name: 'Dashboard', path: '/dashboard', icon: Icons.Dashboard },
     { name: 'Billing', path: '/billing', icon: Icons.Billing },
     { name: 'Inventory', path: '/inventory', icon: Icons.Inventory },
@@ -11,6 +14,9 @@ const Sidebar = () => {
     { name: 'Users', path: '/users', icon: Icons.Users },
     { name: 'Settings', path: '/settings', icon: Icons.Settings },
   ];
+
+  const allowedPages = rolePermissions[currentUser.role.toLowerCase()] || [];
+  const navItems = allNavItems.filter(item => allowedPages.includes(item.name));
 
   return (
     <aside className="w-[178px] bg-[var(--color-sidebar)] text-white flex flex-col h-screen fixed left-0 top-0">

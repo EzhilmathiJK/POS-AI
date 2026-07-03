@@ -43,8 +43,8 @@ const SalesReportTable = () => {
       </div>
 
       <div className="mt-[18px] border border-[#deddf6] rounded-[7px] overflow-hidden flex-1 min-h-0 relative">
-        <div className="h-full overflow-y-auto custom-scrollbar inventory-table-scroll">
-          <table className="w-full table-fixed border-collapse text-[12px] text-[var(--color-primary)]">
+        <div className="h-full overflow-auto custom-scrollbar inventory-table-scroll">
+          <table className="w-full min-w-[500px] table-fixed border-collapse text-[12px] text-[var(--color-primary)]">
             <colgroup>
               <col style={{ width: '42%' }} />
               <col style={{ width: '30%' }} />
@@ -73,7 +73,7 @@ const SalesReportTable = () => {
         </div>
       </div>
 
-      <div className="h-[42px] pt-[14px] grid grid-cols-3 items-start shrink-0 text-[12px] text-[var(--color-primary)] px-[2px]">
+      <div className="min-h-[42px] pt-[14px] flex flex-wrap items-center justify-between gap-[14px] shrink-0 text-[12px] text-[var(--color-primary)] px-[2px]">
         <div className="flex items-center gap-[7px] font-semibold">
           <span>Show</span>
           <EntriesSelect />
@@ -96,7 +96,7 @@ const SalesReportTable = () => {
           </button>
         </div>
 
-        <p className="text-right font-semibold text-[12px] leading-[28px]">Showing 1 to 5 of 20 reports</p>
+        <p className="text-right font-semibold text-[12px]">Showing 1 to 5 of 20 reports</p>
       </div>
     </section>
   );

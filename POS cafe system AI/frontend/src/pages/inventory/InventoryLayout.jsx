@@ -6,16 +6,45 @@ import AddInventoryForm from './components/AddInventoryForm';
 
 const InventoryLayout = () => {
   const [isAddingItem, setIsAddingItem] = useState(false);
+  const [isEditingItem, setIsEditingItem] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+
+  const handleEditItem = (item) => {
+    setSelectedItem(item);
+    setIsEditingItem(true);
+  };
+
+  const handleCancel = () => {
+    setIsAddingItem(false);
+    setIsEditingItem(false);
+    setSelectedItem(null);
+  };
+
+  const handleUpdate = (updatedData) => {
+    console.log('Updating item:', updatedData);
+    handleCancel();
+  };
+
+  const handleDelete = () => {
+    console.log('Deleting item:', selectedItem);
+    handleCancel();
+  };
 
   return (
     <div className="flex flex-col h-full bg-[var(--color-app-bg)] px-[13px] pb-[12px]">
-      <InventoryTopBar isAddingItem={isAddingItem} />
-      {isAddingItem ? (
-        <AddInventoryForm onCancel={() => setIsAddingItem(false)} />
+      <InventoryTopBar isAddingItem={isAddingItem} isEditingItem={isEditingItem} onNavigateBack={handleCancel} />
+      {(isAddingItem || isEditingItem) ? (
+        <AddInventoryForm 
+          mode={isEditingItem ? 'edit' : 'add'} 
+          initialData={selectedItem}
+          onCancel={handleCancel}
+          onUpdate={handleUpdate}
+          onDelete={handleDelete}
+        />
       ) : (
         <>
           <InventoryFilters />
-          <InventoryTable onAddItem={() => setIsAddingItem(true)} />
+          <InventoryTable onAddItem={() => setIsAddingItem(true)} onEditItem={handleEditItem} />
         </>
       )}
     </div>

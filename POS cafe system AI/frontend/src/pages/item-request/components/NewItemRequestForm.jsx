@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Icons } from '../../../assets/icons';
+import ActionModal from '../../../components/ui/ActionModal';
+import { useAppContext } from '../../../context/AppContext';
 
 const itemOptions = [
   'Black Coffee',
@@ -20,12 +22,13 @@ const FieldLabel = ({ children, required = false }) => (
   </span>
 );
 
-const TextInput = ({ placeholder, value, readOnly = false }) => (
+const TextInput = ({ placeholder, value, readOnly = false, onChange }) => (
   <input
     type="text"
     value={value}
     readOnly={readOnly}
     placeholder={placeholder}
+    onChange={onChange}
     style={{ fontSize: '12px', fontWeight: 400 }}
     className={`w-full h-[32px] rounded-[6px] border border-[#deddf6] px-[12px] outline-none focus:border-[var(--color-primary)] ${
       readOnly
@@ -35,12 +38,13 @@ const TextInput = ({ placeholder, value, readOnly = false }) => (
   />
 );
 
-const DateInput = ({ value, readOnly = false }) => (
+const DateInput = ({ value, readOnly = false, onChange }) => (
   <div className="relative">
     <input
       type={readOnly ? 'text' : 'date'}
       value={value}
       readOnly={readOnly}
+      onChange={onChange}
       onClick={(event) => {
         if (!readOnly) event.currentTarget.showPicker?.();
       }}
@@ -53,11 +57,12 @@ const DateInput = ({ value, readOnly = false }) => (
   </div>
 );
 
-const SelectInput = () => (
+const SelectInput = ({ value, onChange }) => (
   <div className="relative">
     <select
       required
-      defaultValue=""
+      value={value || ''}
+      onChange={onChange}
       style={{ fontSize: '12px', fontWeight: 400 }}
       className="w-full h-[32px] appearance-none rounded-[6px] border border-[#deddf6] bg-white pl-[12px] pr-[34px] text-[var(--color-primary)] invalid:text-[#9b8fd6] outline-none focus:border-[var(--color-primary)] cursor-pointer"
     >
@@ -70,8 +75,50 @@ const SelectInput = () => (
   </div>
 );
 
-const NewItemRequestForm = ({ onCancel }) => {
-  const [rows, setRows] = useState([{ id: 1 }]);
+const NewItemRequestForm = ({ mode = 'add', initialData = null, onCancel, onUpdate, onDelete }) => {
+  const [formData, setFormData] = useState({
+    requestId: '',
+    subject: '',
+    requestedBy: 'Admin',
+    requestedDate: '',
+    expectingDelivery: '',
+    status: 'Pending'
+  });
+  const [rows, setRows] = useState([{ id: 1, item: '', quantity: '', expectedDate: '' }]);
+  const { showToast } = useAppContext();
+  const [modalState, setModalState] = useState({ isOpen: false, type: '', step: '' });
+
+  useEffect(() => {
+    if (mode === 'edit' && initialData) {
+      setFormData({
+        requestId: initialData.id || '',
+        subject: initialData.subject || '',
+        requestedBy: initialData.requestedBy || 'Admin',
+        requestedDate: initialData.requestedDate || '',
+        expectingDelivery: initialData.expectedDelivery || '',
+        status: initialData.status || 'Pending'
+      });
+      if (initialData.items && initialData.items.length > 0) {
+        setRows(initialData.items.map((item, index) => ({
+          id: index + 1,
+          item: item.name || '',
+          quantity: item.quantity || '',
+          expectedDate: item.expectedDate || ''
+        })));
+      }
+    } else {
+      const today = new Date().toISOString().split('T')[0];
+      setFormData(prev => ({ ...prev, requestedDate: today }));
+    }
+  }, [mode, initialData]);
+
+  const handleInputChange = (field, value) => {
+    setFormData({ ...formData, [field]: value });
+  };
+
+  const handleRowChange = (rowId, field, value) => {
+    setRows(rows.map(row => row.id === rowId ? { ...row, [field]: value } : row));
+  };
 
   const addRow = () => {
     setRows((currentRows) => [...currentRows, { id: Date.now() }]);
@@ -83,6 +130,39 @@ const NewItemRequestForm = ({ onCancel }) => {
     ));
   };
 
+  const handleSave = () => {
+    if (mode === 'add') {
+      setModalState({ isOpen: true, type: 'success', step: 'saveSuccess' });
+    } else {
+      setModalState({ isOpen: true, type: 'success', step: 'updateSuccess' });
+    }
+  };
+
+  const handleSubmitRequest = () => {
+    setModalState({ isOpen: true, type: 'submit', step: 'submitConfirm' });
+  };
+
+  const handleCancelRequest = () => {
+    setModalState({ isOpen: true, type: 'cancel', step: 'cancelConfirm' });
+  };
+
+  const handleModalPrimaryAction = () => {
+    if (modalState.step === 'saveSuccess') {
+      setModalState({ isOpen: false, type: '', step: '' });
+      console.log('Save:', { ...formData, items: rows });
+    } else if (modalState.step === 'updateSuccess') {
+      setModalState({ isOpen: false, type: '', step: '' });
+      if (onUpdate) onUpdate({ ...formData, items: rows });
+    } else if (modalState.step === 'submitConfirm') {
+      setModalState({ isOpen: false, type: '', step: '' });
+      console.log('Submit:', { ...formData, items: rows });
+    } else if (modalState.step === 'cancelConfirm') {
+      setModalState({ isOpen: false, type: '', step: '' });
+      showToast('Request cancelled successfully', 'success');
+      if (onDelete) onDelete();
+    }
+  };
+
   return (
     <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar px-[18px] pb-[18px]">
       <section className="mt-[27px] bg-white rounded-[6px] border border-[var(--color-border)] shadow-[0_1px_2px_rgba(3,4,90,0.08)] px-[18px] pt-[21px] pb-[19px]">
@@ -91,27 +171,34 @@ const NewItemRequestForm = ({ onCancel }) => {
         <div className="grid grid-cols-3 gap-x-[18px] gap-y-[19px]">
           <label>
             <FieldLabel>Request ID</FieldLabel>
-            <TextInput value="REQ-000001 (Auto generated)" readOnly />
+            <TextInput value={formData.requestId || 'REQ-000001 (Auto generated)'} readOnly />
           </label>
           <label>
             <FieldLabel required>Subject</FieldLabel>
-            <TextInput placeholder="Enter subject" />
+            <TextInput 
+              placeholder="Enter subject" 
+              value={formData.subject}
+              onChange={(e) => handleInputChange('subject', e.target.value)}
+            />
           </label>
           <label>
             <FieldLabel>Requested By</FieldLabel>
-            <TextInput value="Admin" readOnly />
+            <TextInput value={formData.requestedBy} readOnly />
           </label>
           <label>
             <FieldLabel>Requested Date</FieldLabel>
-            <DateInput value="01-07-2026" readOnly />
+            <DateInput value={formData.requestedDate} readOnly />
           </label>
           <label>
             <FieldLabel required>Expecting Delivery</FieldLabel>
-            <DateInput />
+            <DateInput 
+              value={formData.expectingDelivery}
+              onChange={(e) => handleInputChange('expectingDelivery', e.target.value)}
+            />
           </label>
           <label>
             <FieldLabel>Status</FieldLabel>
-            <TextInput value="Pending" readOnly />
+            <TextInput value={formData.status} readOnly />
           </label>
         </div>
       </section>
@@ -148,13 +235,23 @@ const NewItemRequestForm = ({ onCancel }) => {
               className="grid grid-cols-[1.55fr_1fr_1fr_110px] min-h-[50px] border-b border-[#deddf6] last:border-b-0 items-center"
             >
               <div className="px-[15px]">
-                <SelectInput />
+                <SelectInput 
+                  value={row.item}
+                  onChange={(e) => handleRowChange(row.id, 'item', e.target.value)}
+                />
               </div>
               <div className="px-[15px]">
-                <TextInput placeholder="Enter quantity" />
+                <TextInput 
+                  placeholder="Enter quantity" 
+                  value={row.quantity}
+                  onChange={(e) => handleRowChange(row.id, 'quantity', e.target.value)}
+                />
               </div>
               <div className="px-[15px]">
-                <DateInput />
+                <DateInput 
+                  value={row.expectedDate}
+                  onChange={(e) => handleRowChange(row.id, 'expectedDate', e.target.value)}
+                />
               </div>
               <div className="px-[20px] flex justify-center">
                 <button
@@ -177,18 +274,30 @@ const NewItemRequestForm = ({ onCancel }) => {
             style={{ fontSize: '14px' }}
             className="h-[36px] min-w-[102px] rounded-[7px] border border-[#deddf6] bg-white px-[24px] font-bold text-[var(--color-text)] hover:bg-gray-50"
           >
-            Cancel
+            {mode === 'add' ? 'Cancel' : 'Back'}
           </button>
+          {mode === 'edit' && (
+            <button
+              type="button"
+              onClick={handleCancelRequest}
+              style={{ fontSize: '14px' }}
+              className="h-[36px] min-w-[130px] rounded-[7px] border border-[#ff1e27] bg-white px-[24px] font-bold text-[#ff1e27] hover:bg-[#ffe4e7]"
+            >
+              Cancel Request
+            </button>
+          )}
           <button
             type="button"
+            onClick={handleSave}
             style={{ fontSize: '14px' }}
             className="h-[36px] min-w-[113px] rounded-[7px] bg-[var(--color-primary)] px-[24px] font-bold text-white flex items-center justify-center gap-[10px] hover:bg-[var(--color-primary-hover)]"
           >
             <Icons.Save className="text-[16px]" />
-            Save
+            {mode === 'add' ? 'Save' : 'Update'}
           </button>
           <button
             type="button"
+            onClick={handleSubmitRequest}
             style={{ fontSize: '14px' }}
             className="h-[36px] min-w-[180px] rounded-[7px] bg-[#078c22] px-[24px] font-bold text-white flex items-center justify-center gap-[10px] hover:bg-[#05791d]"
           >
@@ -197,6 +306,36 @@ const NewItemRequestForm = ({ onCancel }) => {
           </button>
         </div>
       </section>
+
+      <ActionModal
+        isOpen={modalState.isOpen}
+        onClose={() => setModalState({ isOpen: false, type: '', step: '' })}
+        type={modalState.type}
+        title={
+          modalState.step === 'saveSuccess' ? 'Item Request Saved!' :
+          modalState.step === 'updateSuccess' ? 'Item Request Updated!' :
+          modalState.step === 'submitConfirm' ? 'Submit Item Request?' :
+          modalState.step === 'cancelConfirm' ? 'Cancel Request?' : ''
+        }
+        message={
+          modalState.step === 'saveSuccess' ? 'Your item request has been saved as Pending.' :
+          modalState.step === 'updateSuccess' ? 'Your item request has been updated successfully.' :
+          modalState.step === 'submitConfirm' ? 'Please confirm that you want to submit this item request. You won\'t be able to edit it after submission.' :
+          modalState.step === 'cancelConfirm' ? 'Are you sure you want to permanently abort this supply request?' : ''
+        }
+        secondaryAction={
+          ['submitConfirm', 'cancelConfirm'].includes(modalState.step)
+            ? { text: modalState.step === 'cancelConfirm' ? 'No, Keep it' : 'Cancel', onClick: () => setModalState({ isOpen: false, type: '', step: '' }) }
+            : null
+        }
+        primaryAction={{
+          text: modalState.step === 'saveSuccess' ? 'View Requests' :
+                modalState.step === 'updateSuccess' ? 'View Requests' :
+                modalState.step === 'submitConfirm' ? 'Yes, Submit' :
+                modalState.step === 'cancelConfirm' ? 'Yes, Cancel' : '',
+          onClick: handleModalPrimaryAction
+        }}
+      />
     </div>
   );
 };

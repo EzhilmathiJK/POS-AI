@@ -27,6 +27,7 @@ const DateField = ({ label }) => (
     <div className="relative">
       <input
         type="date"
+        onClick={(event) => event.currentTarget.showPicker?.()}
         style={{ fontSize: '12px', fontWeight: 400 }}
         className="w-full h-[34px] bg-white rounded-[6px] border border-[#deddf6] pl-[12px] pr-[30px] text-black focus:outline-none focus:border-[var(--color-primary)] cursor-pointer [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:cursor-pointer"
       />

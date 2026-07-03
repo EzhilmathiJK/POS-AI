@@ -1,6 +1,6 @@
 import { Icons } from '../../../assets/icons';
 
-const ItemRequestTopBar = ({ isAddingRequest = false, subViewTitle = '' }) => {
+const ItemRequestTopBar = ({ isAddingRequest = false, isEditingRequest = false, subViewTitle = '', onNavigateBack }) => {
   return (
     <header className="h-[76px] flex items-center justify-between shrink-0">
       <div className="flex items-center gap-[18px] pl-[8px]">
@@ -9,9 +9,9 @@ const ItemRequestTopBar = ({ isAddingRequest = false, subViewTitle = '' }) => {
         </button>
         <div>
           <h1 className="text-[22px] font-bold text-black leading-none">Item Request</h1>
-          {isAddingRequest && (
+          {(isAddingRequest || isEditingRequest) && (
             <p className="mt-[8px] text-[12px] leading-[14px] font-semibold text-[var(--color-primary)]">
-              Item Request &gt; {subViewTitle || 'Add Item Request'}
+              <button onClick={onNavigateBack} className="hover:underline cursor-pointer">Item Request</button> &gt; <span className="text-[var(--color-text)]">{subViewTitle || 'Add Item Request'}</span>
             </p>
           )}
         </div>

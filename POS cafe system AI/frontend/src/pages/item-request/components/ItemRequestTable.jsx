@@ -40,7 +40,7 @@ const EntriesSelect = () => (
   </div>
 );
 
-const ItemRequestTable = ({ onNewItemRequest }) => {
+const ItemRequestTable = ({ onNewItemRequest, onEditRequest }) => {
   return (
     <section className="flex-1 min-h-0 bg-white rounded-[6px] border border-[var(--color-border)] shadow-[0_1px_2px_rgba(3,4,90,0.04)] mt-[12px] px-[14px] pt-[16px] pb-[16px] flex flex-col">
       <div className="flex items-start justify-between shrink-0 px-[6px]">
@@ -94,7 +94,14 @@ const ItemRequestTable = ({ onNewItemRequest }) => {
             <tbody>
               {itemRequests.map((request) => (
                 <tr key={request.id} className="h-[64px] border-b border-[#deddf6] last:border-b-0">
-                  <td className="px-[14px] font-normal overflow-hidden text-ellipsis whitespace-nowrap">{request.id}</td>
+                  <td className="px-[14px] font-normal overflow-hidden text-ellipsis whitespace-nowrap">
+                    <button 
+                      onClick={() => onEditRequest(request)}
+                      className="text-[var(--color-primary)] hover:underline cursor-pointer text-left"
+                    >
+                      {request.id}
+                    </button>
+                  </td>
                   <td className="px-[14px] font-normal overflow-hidden text-ellipsis whitespace-nowrap">{request.subject}</td>
                   <td className="px-[14px] font-normal overflow-hidden text-ellipsis whitespace-nowrap">{request.requestedBy}</td>
                   <td className="px-[14px] font-normal">

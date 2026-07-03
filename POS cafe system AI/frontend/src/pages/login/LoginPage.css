@@ -53,7 +53,7 @@
   margin: 29px 0 0;
   font-size: 40px;
   line-height: 48px;
-  font-weight: 900;
+  font-weight: bold;
   letter-spacing: 0;
 }
 
@@ -61,7 +61,7 @@
   margin: 5px 0 0;
   font-size: 20px;
   line-height: 26px;
-  font-weight: 800;
+  font-weight: bold;
 }
 
 .login-hero-rule {
@@ -81,7 +81,7 @@
   margin: 0;
   font-size: 18px;
   line-height: 23px;
-  font-weight: 900;
+  font-weight: bold;
 }
 
 .login-hero-copy p {
@@ -89,7 +89,7 @@
   margin: 13px 0 0;
   font-size: 14px;
   line-height: 21px;
-  font-weight: 700;
+  font-weight: normal;
 }
 
 .login-feature-list {
@@ -121,14 +121,14 @@
   display: block;
   font-size: 14px;
   line-height: 17px;
-  font-weight: 900;
+  font-weight: bold;
 }
 
 .login-feature p {
   margin: 6px 0 0;
   font-size: 12px;
   line-height: 15px;
-  font-weight: 700;
+  font-weight: normal;
 }
 
 .login-panel {
@@ -175,7 +175,7 @@
   margin: 23px 0 0;
   font-size: 24px;
   line-height: 30px;
-  font-weight: 900;
+  font-weight: bold;
   letter-spacing: 0;
   color: #0b0d34;
 }
@@ -188,9 +188,9 @@
 
 .login-subtitle {
   margin: 8px 0 0;
-  font-size: 14px;
+  font-size: 13px;
   line-height: 18px;
-  font-weight: 700;
+  font-weight: 600;
   color: #807aa8;
 }
 
@@ -220,7 +220,7 @@
   margin-bottom: 10px;
   font-size: 13px;
   line-height: 16px;
-  font-weight: 900;
+  font-weight: 600;
   color: #0b0d34;
 }
 
@@ -252,8 +252,8 @@
   outline: none;
   padding: 0 16px 0 12px;
   color: #0b0d34;
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: normal;
   background: transparent;
 }
 
@@ -285,9 +285,9 @@
   align-items: center;
   justify-content: space-between;
   color: #7773a8;
-  font-size: 11px;
+  font-size: 12px;
   line-height: 14px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .login-checkbox {
@@ -331,7 +331,7 @@
 .login-options a {
   color: #5b31ee;
   text-decoration: none;
-  font-weight: 900;
+  font-weight: 600;
 }
 
 .register-terms {
@@ -341,7 +341,7 @@
   color: #7773a8;
   font-size: 12px;
   line-height: 15px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .register-terms .login-checkmark {
@@ -353,7 +353,7 @@
 .register-switch button {
   color: #5b31ee;
   text-decoration: none;
-  font-weight: 900;
+  font-weight: 600;
 }
 
 .login-submit {
@@ -368,9 +368,9 @@
   align-items: center;
   justify-content: center;
   gap: 16px;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 16px;
-  font-weight: 900;
+  font-weight: bold;
   cursor: pointer;
   box-shadow: 0 12px 24px rgba(91, 49, 238, 0.18);
 }
@@ -394,7 +394,7 @@
   color: #8a84b3;
   font-size: 12px;
   line-height: 15px;
-  font-weight: 900;
+  font-weight: bold;
 }
 
 .login-divider span {
@@ -420,7 +420,7 @@
   gap: 14px;
   font-size: 14px;
   line-height: 18px;
-  font-weight: 900;
+  font-weight: bold;
   cursor: pointer;
 }
 
@@ -434,7 +434,7 @@
   color: #8a84b3;
   font-size: 12px;
   line-height: 15px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .register-switch button {
@@ -449,7 +449,7 @@
   margin: 42px 0 32px;
   font-size: 12px;
   line-height: 15px;
-  font-weight: 800;
+  font-weight: normal;
   color: #8a84b3;
   z-index: 1;
   flex: 0 0 auto;

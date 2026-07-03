@@ -12,6 +12,8 @@ import PriceAmendment from './PriceAmendment';
 const BillingLayout = () => {
   const [billItems, setBillItems] = useState([]);
   const [showPriceAmendment, setShowPriceAmendment] = useState(false);
+  const [viewMode, setViewMode] = useState('grid');
+  const [activeCategory, setActiveCategory] = useState('All Items');
 
   const subtotal = useMemo(
     () => billItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
@@ -70,10 +72,24 @@ const BillingLayout = () => {
             />
           </div>
           <div className="flex gap-[5px]">
-            <button className="bg-[var(--color-primary)] text-white w-[33px] h-[33px] rounded-[7px] shadow-sm flex items-center justify-center">
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`w-[33px] h-[33px] rounded-[7px] shadow-sm flex items-center justify-center transition-colors ${
+                viewMode === 'grid'
+                  ? 'bg-[var(--color-primary)] text-white'
+                  : 'bg-white text-[var(--color-text)] border border-[var(--color-border)] hover:bg-gray-50'
+              }`}
+            >
               <Icons.GridMode className="text-[18px]" />
             </button>
-            <button className="bg-white text-[var(--color-text)] hover:bg-gray-50 w-[31px] h-[31px] rounded-[7px] transition-colors flex items-center justify-center border border-[var(--color-border)]">
+            <button
+              onClick={() => setViewMode('list')}
+              className={`w-[33px] h-[33px] rounded-[7px] shadow-sm flex items-center justify-center transition-colors ${
+                viewMode === 'list'
+                  ? 'bg-[var(--color-primary)] text-white'
+                  : 'bg-white text-[var(--color-text)] border border-[var(--color-border)] hover:bg-gray-50'
+              }`}
+            >
               <Icons.ListMode className="text-[18px]" />
             </button>
           </div>
@@ -95,11 +111,11 @@ const BillingLayout = () => {
         </div>
 
         <div className="flex shrink-0">
-          <Categories />
+          <Categories activeCategory={activeCategory} onSelectCategory={setActiveCategory} />
         </div>
 
         <div className="flex-1 flex flex-col min-w-0">
-          <MenuGrid onAddItem={handleAddItem} quantities={itemQuantities} />
+          <MenuGrid activeCategory={activeCategory} onAddItem={handleAddItem} quantities={itemQuantities} viewMode={viewMode} />
         </div>
       </div>
 
