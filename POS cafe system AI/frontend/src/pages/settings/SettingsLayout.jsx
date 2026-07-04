@@ -14,7 +14,7 @@ const SettingsLayout = () => {
   };
 
   return (
-    <div className="flex flex-col h-full bg-[var(--color-app-bg)] px-[15px] pb-[12px]">
+    <div className="w-full h-full min-w-0 flex flex-col bg-[var(--color-app-bg)] overflow-x-hidden overflow-y-auto box-border px-[15px] sm:px-[13px] pb-[12px]">
       <SettingsTopBar />
       
       <section className="flex-1 min-h-0 flex flex-col bg-white rounded-[6px] border border-[var(--color-border)] shadow-[0_1px_2px_rgba(3,4,90,0.04)] overflow-hidden">

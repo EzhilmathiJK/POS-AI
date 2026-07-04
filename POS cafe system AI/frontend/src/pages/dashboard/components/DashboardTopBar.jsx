@@ -1,10 +1,13 @@
 import { Icons } from '../../../assets/icons';
+import { useAppContext } from '../../../context/AppContext';
 
 const DashboardTopBar = () => {
+  const { toggleSidebar } = useAppContext();
+
   return (
     <header className="h-[60px] flex items-center justify-between shrink-0">
       <div className="flex items-center gap-[18px] flex-1">
-        <button className="text-[var(--color-text)] hover:bg-white w-[28px] h-[28px] rounded-[5px] flex items-center justify-center lg:hidden">
+        <button onClick={toggleSidebar} className="text-[var(--color-text)] hover:bg-white w-[28px] h-[28px] rounded-[5px] flex items-center justify-center shrink-0">
           <Icons.Menu className="text-[20px]" />
         </button>
         <div className="relative w-full max-w-[400px]">
@@ -27,19 +30,20 @@ const DashboardTopBar = () => {
           <Icons.ChevronDown className="text-[12px] text-[#9b9ab1]" />
         </div>
         
-        <button className="relative w-[36px] h-[36px] rounded-full bg-white border border-[#deddf6] flex items-center justify-center hover:bg-gray-50">
-          <Icons.Info className="text-[16px] text-[var(--color-text)]" /> {/* Assuming bell icon might be in Icons, if not Info is placeholder */}
-          <span className="absolute top-[8px] right-[10px] w-[6px] h-[6px] bg-[#ff1e27] rounded-full border border-white"></span>
+        <button className="relative w-[36px] h-[36px] flex items-center justify-center hover:bg-gray-50 rounded-full transition-colors mr-[10px]">
+          <Icons.Bell className="text-[20px] text-[var(--color-text)]" />
+          <span className="absolute top-[5px] right-[7px] w-[8px] h-[8px] bg-[var(--color-primary)] rounded-full"></span>
         </button>
 
-        <div className="flex items-center gap-[10px] cursor-pointer">
-          <div className="w-[36px] h-[36px] rounded-full bg-[var(--color-primary)] flex items-center justify-center text-white font-bold text-[14px]">
-            A
+        <div className="flex items-center gap-[12px] cursor-pointer hover:opacity-90 transition-opacity">
+          <div className="w-[38px] h-[38px] rounded-full bg-[var(--color-primary)] flex items-center justify-center text-white font-bold text-[13px]">
+            AD
           </div>
-          <div className="hidden sm:block">
-            <p className="text-[13px] font-bold text-[var(--color-text)] leading-[15px]">admin</p>
-            <p className="text-[11px] text-[#8a84b3] leading-[15px]">admin</p>
+          <div className="hidden sm:flex flex-col items-start justify-center">
+            <p className="text-[14px] font-bold text-[#14142b] leading-[18px]">Admin User</p>
+            <p className="text-[12px] font-semibold text-[#8a84b3] leading-[16px]">Administrator</p>
           </div>
+          <Icons.ChevronDown className="hidden sm:block text-[14px] text-[#14142b] font-bold" strokeWidth={3} />
         </div>
       </div>
     </header>

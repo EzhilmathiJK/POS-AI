@@ -46,6 +46,10 @@ export const AppProvider = ({ children }) => {
     }, 3000);
   };
 
+  // Sidebar Toggle State
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const toggleSidebar = () => setIsSidebarOpen(prev => !prev);
+
   return (
     <AppContext.Provider value={{
       settings,
@@ -56,7 +60,10 @@ export const AppProvider = ({ children }) => {
       setRolePermissions,
       currentUser,
       toast,
-      showToast
+      showToast,
+      isSidebarOpen,
+      setIsSidebarOpen,
+      toggleSidebar
     }}>
       {children}
     </AppContext.Provider>

@@ -40,10 +40,10 @@ const MenuGrid = ({ activeCategory, onAddItem, quantities = {}, viewMode = 'grid
   if (page > 0 && totalPages === 0) setPage(0);
 
   return (
-    <div className="flex-1 bg-white rounded-[7px] flex flex-col overflow-hidden" style={{ minHeight: 0 }}>
+    <div className="xl:flex-1 h-auto xl:h-full bg-white rounded-[7px] flex flex-col xl:overflow-hidden min-h-[400px] xl:min-h-0">
 
       {/* Items area */}
-      <div className="flex-1 overflow-hidden p-[10px]">
+      <div className="xl:flex-1 xl:overflow-hidden p-[10px]">
         {filteredItems.length === 0 ? (
           <div className="h-full flex items-center justify-center">
             <span className="text-[12px] leading-[14px] font-normal text-[var(--color-muted)]">
@@ -52,7 +52,7 @@ const MenuGrid = ({ activeCategory, onAddItem, quantities = {}, viewMode = 'grid
           </div>
         ) : viewMode === 'grid' ? (
           /* ── GRID VIEW ── */
-          <div className="grid grid-cols-4 gap-x-[10px] gap-y-[8px] h-full content-start">
+          <div className="grid grid-cols-3 xl:grid-cols-4 gap-x-[10px] gap-y-[8px] h-auto xl:h-full content-start">
             {pageItems.map((item) => {
               const quantity = quantities[item.id] || 0;
               return (

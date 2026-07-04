@@ -74,7 +74,7 @@ const UserFormModal = ({ isOpen, onClose, onSave, onDelete, initialData }) => {
 
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="px-[24px] py-[20px]">
-          <div className="grid grid-cols-2 gap-x-[29px] gap-y-[19px]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-[29px] gap-y-[19px]">
             {/* Full Name */}
             <label>
               <FieldLabel required>Full Name</FieldLabel>
@@ -105,8 +105,7 @@ const UserFormModal = ({ isOpen, onClose, onSave, onDelete, initialData }) => {
               />
             </label>
 
-            {/* Email */}
-            <label className="col-span-2">
+            <label className="sm:col-span-2">
               <FieldLabel required>Email</FieldLabel>
               <input
                 type="email"
@@ -155,8 +154,7 @@ const UserFormModal = ({ isOpen, onClose, onSave, onDelete, initialData }) => {
               />
             </label>
 
-            {/* Active User Checkbox */}
-            <label className="col-span-2 flex items-center gap-[8px] mt-[4px] cursor-pointer">
+            <label className="sm:col-span-2 flex items-center gap-[8px] mt-[4px] cursor-pointer">
               <input
                 type="checkbox"
                 name="status"
@@ -171,7 +169,7 @@ const UserFormModal = ({ isOpen, onClose, onSave, onDelete, initialData }) => {
           </div>
 
           {/* Footer Actions */}
-          <div className="flex justify-center gap-[11px] mt-[30px]">
+          <div className="flex flex-wrap justify-center gap-[11px] mt-[30px]">
             <button
               type="button"
               onClick={onClose}

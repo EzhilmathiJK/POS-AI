@@ -5,7 +5,7 @@ const CurrentBill = ({ items = [], onRemoveItem }) => {
   const hasItems = items.length > 0;
 
   return (
-    <div className="bg-white rounded-[7px] flex-1 flex flex-col min-h-0">
+    <div className="bg-white rounded-[7px] xl:flex-1 flex flex-col xl:min-h-0 min-h-[350px]">
       <div className="grid grid-cols-[1fr_70px_100px_90px_24px] text-[12px] font-semibold text-[var(--color-text)] px-[12px] pt-[17px] pb-[12px] border-b border-[var(--color-border)]">
         <div>Item</div>
         <div className="text-center">Qty</div>
@@ -16,7 +16,7 @@ const CurrentBill = ({ items = [], onRemoveItem }) => {
 
       {hasItems ? (
         <>
-          <div className="flex-1 min-h-0 px-[12px] pt-[7px] overflow-y-auto custom-scrollbar">
+          <div className="xl:flex-1 xl:min-h-0 px-[12px] pt-[7px] xl:overflow-y-auto custom-scrollbar">
             {items.map((item) => (
               <div
                 key={item.id}

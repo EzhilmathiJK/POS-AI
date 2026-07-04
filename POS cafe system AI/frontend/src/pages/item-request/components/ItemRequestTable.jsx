@@ -42,98 +42,95 @@ const EntriesSelect = () => (
 
 const ItemRequestTable = ({ onNewItemRequest, onEditRequest }) => {
   return (
-    <section className="flex-1 min-h-0 bg-white rounded-[6px] border border-[var(--color-border)] shadow-[0_1px_2px_rgba(3,4,90,0.04)] mt-[12px] px-[14px] pt-[16px] pb-[16px] flex flex-col">
-      <div className="flex items-start justify-between shrink-0 px-[6px]">
-        <div>
+    <section className="w-full flex-1 min-h-[520px] lg:min-h-0 flex flex-col bg-white rounded-[6px] border border-[var(--color-border)] shadow-[0_1px_2px_rgba(3,4,90,0.04)] mt-[12px] overflow-hidden min-w-0 shrink-0">
+      
+      {/* Header: Title + Action Buttons */}
+      <div className="w-full px-[14px] pt-[16px] pb-[10px] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-[14px] shrink-0">
+        <div className="flex flex-row items-center justify-between sm:flex-col sm:items-start gap-[2px]">
           <h2 className="text-[13px] leading-[19px] font-semibold text-[var(--color-text)]">Item Request List</h2>
-          <p className="text-[12px] leading-[18px] font-normal text-[var(--color-primary)]">Total 10 requests</p>
+          <span className="text-[12px] leading-[18px] font-normal text-[var(--color-primary)]">Total 10 requests</span>
         </div>
 
-        <div className="flex gap-[10px]">
+        <div className="grid grid-cols-2 gap-[8px] sm:flex sm:items-center sm:gap-[10px] w-full sm:w-auto">
           <button
             type="button"
             onClick={onNewItemRequest}
             style={{ fontSize: '14px' }}
-            className="h-[36px] px-[16px] rounded-[6px] bg-[var(--color-primary)] text-white flex items-center gap-[7px] font-bold hover:bg-[var(--color-primary-hover)]"
+            className="h-[38px] min-w-0 px-[10px] sm:px-[16px] rounded-[6px] bg-[var(--color-primary)] text-white flex items-center justify-center gap-[7px] font-bold hover:bg-[var(--color-primary-hover)] text-center leading-[16px] whitespace-normal cursor-pointer"
           >
             <Icons.Plus className="text-[14px]" />
             New Item Request
           </button>
-          <button style={{ fontSize: '14px' }} className="h-[36px] px-[16px] rounded-[6px] border border-[#deddf6] bg-white text-[var(--color-text)] flex items-center gap-[7px] font-bold hover:bg-gray-50">
+          <button style={{ fontSize: '14px' }} className="h-[38px] min-w-0 px-[10px] sm:px-[16px] rounded-[6px] border border-[#deddf6] bg-white text-[var(--color-text)] flex items-center justify-center gap-[7px] font-bold hover:bg-gray-50 text-center leading-[16px] whitespace-normal cursor-pointer">
             <Icons.FileExcel className="text-[14px]" />
             Export to Excel
           </button>
         </div>
       </div>
 
-      <div className="mt-[18px] border border-[#deddf6] rounded-[7px] overflow-hidden flex-1 min-h-0 relative">
-        <div className="h-full overflow-y-auto custom-scrollbar inventory-table-scroll">
-          <table className="w-full table-fixed border-collapse text-[12px] text-[var(--color-primary)]">
-            <colgroup>
-              <col style={{ width: '14%' }} />
-              <col style={{ width: '20%' }} />
-              <col style={{ width: '13%' }} />
-              <col style={{ width: '16%' }} />
-              <col style={{ width: '16%' }} />
-              <col style={{ width: '12%' }} />
-              <col style={{ width: '9%' }} />
-            </colgroup>
-            <thead className="sticky top-0 z-10">
-              <tr className="h-[50px] bg-[#f7f6ff] border-b border-[#deddf6]">
-                {columns.map((column) => (
-                  <th
-                    key={column}
-                    className="font-semibold text-[13px] text-[var(--color-text)] px-[14px] text-left whitespace-nowrap overflow-hidden text-ellipsis"
-                  >
-                    {column}
-                    <SortMark />
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {itemRequests.map((request) => (
-                <tr key={request.id} className="h-[64px] border-b border-[#deddf6] last:border-b-0">
-                  <td className="px-[14px] font-normal overflow-hidden text-ellipsis whitespace-nowrap">
-                    <button 
-                      onClick={() => onEditRequest(request)}
-                      className="text-[var(--color-primary)] hover:underline cursor-pointer text-left"
-                    >
-                      {request.id}
-                    </button>
-                  </td>
-                  <td className="px-[14px] font-normal overflow-hidden text-ellipsis whitespace-nowrap">{request.subject}</td>
-                  <td className="px-[14px] font-normal overflow-hidden text-ellipsis whitespace-nowrap">{request.requestedBy}</td>
-                  <td className="px-[14px] font-normal">
-                    <div className="truncate">{request.requestedDate}</div>
-                    <div className="mt-[3px] truncate">{request.requestedTime}</div>
-                  </td>
-                  <td className="px-[14px] font-normal overflow-hidden text-ellipsis whitespace-nowrap">{request.expectedDelivery}</td>
-                  <td className="px-[14px] font-normal">
-                    <span className={`inline-flex items-center justify-center h-[22px] rounded-[5px] px-[10px] text-[11px] font-semibold ${statusClasses[request.status]}`}>
-                      {request.status}
-                    </span>
-                  </td>
-                  <td className="px-[14px] font-normal">
-                    <button className="w-[28px] h-[28px] rounded-[6px] text-[var(--color-primary)] hover:bg-[var(--color-primary-soft)] flex items-center justify-center" aria-label={`View ${request.id}`}>
-                      <Icons.Eye className="text-[14px]" />
-                    </button>
-                  </td>
-                </tr>
+      {/* Table container with horizontal scroll */}
+      <div className="flex-1 mx-[14px] mb-[4px] border border-[#deddf6] rounded-[7px] overflow-auto min-w-0 inventory-table-scroll">
+        <table className="min-w-[800px] w-full border-collapse text-[12px] text-[var(--color-primary)]">
+          <thead className="sticky top-0 z-10">
+            <tr className="h-[50px] bg-[#f7f6ff] border-b border-[#deddf6]">
+              {columns.map((column) => (
+                <th
+                  key={column}
+                  className="font-semibold text-[13px] text-[var(--color-text)] px-[14px] text-left whitespace-nowrap"
+                >
+                  {column}
+                  <SortMark />
+                </th>
               ))}
-            </tbody>
-          </table>
-        </div>
+            </tr>
+          </thead>
+          <tbody>
+            {itemRequests.map((request) => (
+              <tr key={request.id} className="h-[64px] border-b border-[#deddf6] last:border-b-0 hover:bg-gray-50 transition-colors">
+                <td className="px-[14px] font-normal whitespace-nowrap">
+                  <button 
+                    onClick={() => onEditRequest(request)}
+                    className="text-[var(--color-primary)] hover:underline cursor-pointer text-left"
+                  >
+                    {request.id}
+                  </button>
+                </td>
+                <td className="px-[14px] font-normal whitespace-nowrap">{request.subject}</td>
+                <td className="px-[14px] font-normal whitespace-nowrap">{request.requestedBy}</td>
+                <td className="px-[14px] font-normal whitespace-nowrap">
+                  <div>{request.requestedDate}</div>
+                  <div className="mt-[3px]">{request.requestedTime}</div>
+                </td>
+                <td className="px-[14px] font-normal whitespace-nowrap">{request.expectedDelivery}</td>
+                <td className="px-[14px] font-normal whitespace-nowrap">
+                  <span className={`inline-flex items-center justify-center h-[22px] rounded-[5px] px-[10px] text-[11px] font-semibold ${statusClasses[request.status]}`}>
+                    {request.status}
+                  </span>
+                </td>
+                <td className="px-[14px] font-normal whitespace-nowrap">
+                  <button className="w-[28px] h-[28px] rounded-[6px] text-[var(--color-primary)] hover:bg-[var(--color-primary-soft)] flex items-center justify-center cursor-pointer" aria-label={`View ${request.id}`}>
+                    <Icons.Eye className="text-[14px]" />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
-      <div className="h-[42px] pt-[14px] grid grid-cols-3 items-start shrink-0 text-[12px] text-[var(--color-primary)] px-[6px]">
-        <div className="flex items-center gap-[7px] font-semibold">
-          <span>Show</span>
-          <EntriesSelect />
-          <span>entries</span>
+      {/* Pagination */}
+      <div className="w-full px-[14px] py-[14px] flex flex-col md:flex-row md:items-center justify-between gap-[10px] shrink-0 text-[12px] text-[var(--color-primary)]">
+        
+        <div className="flex items-center justify-between md:justify-start w-full md:w-auto gap-[10px]">
+          <div className="flex items-center gap-[7px] font-semibold">
+            <span>Show</span>
+            <EntriesSelect />
+            <span>entries</span>
+          </div>
+          <p className="font-semibold text-[12px] md:hidden">Showing 1 to 10 of 10 requests</p>
         </div>
 
-        <div className="flex justify-center gap-[5px]">
+        <div className="flex items-center justify-center gap-[5px] w-full md:w-auto">
           <button className="w-[28px] h-[28px] rounded-[7px] border border-[var(--color-border)] text-[#b9bdcb] flex items-center justify-center">
             <Icons.First className="text-[14px]" />
           </button>
@@ -149,7 +146,7 @@ const ItemRequestTable = ({ onNewItemRequest, onEditRequest }) => {
           </button>
         </div>
 
-        <p className="text-right font-semibold text-[12px] leading-[28px]">Showing 1 to 10 of 10 requests</p>
+        <p className="text-right font-semibold text-[12px] hidden md:block">Showing 1 to 10 of 10 requests</p>
       </div>
     </section>
   );

@@ -75,6 +75,16 @@ const SelectInput = ({ value, onChange }) => (
   </div>
 );
 
+const formatDateForInput = (dateString) => {
+  if (!dateString) return '';
+  const d = new Date(dateString);
+  if (isNaN(d.getTime())) return dateString;
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 const NewItemRequestForm = ({ mode = 'add', initialData = null, onCancel, onUpdate, onDelete }) => {
   const [formData, setFormData] = useState({
     requestId: '',
@@ -94,8 +104,8 @@ const NewItemRequestForm = ({ mode = 'add', initialData = null, onCancel, onUpda
         requestId: initialData.id || '',
         subject: initialData.subject || '',
         requestedBy: initialData.requestedBy || 'Admin',
-        requestedDate: initialData.requestedDate || '',
-        expectingDelivery: initialData.expectedDelivery || '',
+        requestedDate: formatDateForInput(initialData.requestedDate),
+        expectingDelivery: formatDateForInput(initialData.expectedDelivery),
         status: initialData.status || 'Pending'
       });
       if (initialData.items && initialData.items.length > 0) {
@@ -103,11 +113,11 @@ const NewItemRequestForm = ({ mode = 'add', initialData = null, onCancel, onUpda
           id: index + 1,
           item: item.name || '',
           quantity: item.quantity || '',
-          expectedDate: item.expectedDate || ''
+          expectedDate: formatDateForInput(item.expectedDate)
         })));
       }
     } else {
-      const today = new Date().toISOString().split('T')[0];
+      const today = new Date().toLocaleDateString('en-CA');
       setFormData(prev => ({ ...prev, requestedDate: today }));
     }
   }, [mode, initialData]);
@@ -164,11 +174,11 @@ const NewItemRequestForm = ({ mode = 'add', initialData = null, onCancel, onUpda
   };
 
   return (
-    <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar px-[18px] pb-[18px]">
+    <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar px-[18px] md:px-[50px] lg:px-[154px] pb-[18px]">
       <section className="mt-[27px] bg-white rounded-[6px] border border-[var(--color-border)] shadow-[0_1px_2px_rgba(3,4,90,0.08)] px-[18px] pt-[21px] pb-[19px]">
         <h2 className="text-[17px] leading-[20px] font-bold text-[var(--color-text)] mb-[18px]">Request Information</h2>
 
-        <div className="grid grid-cols-3 gap-x-[18px] gap-y-[19px]">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-[18px] gap-y-[19px]">
           <label>
             <FieldLabel>Request ID</FieldLabel>
             <TextInput value={formData.requestId || 'REQ-000001 (Auto generated)'} readOnly />
@@ -221,8 +231,9 @@ const NewItemRequestForm = ({ mode = 'add', initialData = null, onCancel, onUpda
           </button>
         </div>
 
-        <div className="mt-[17px] border border-[#deddf6] rounded-[7px] overflow-hidden">
-          <div className="grid grid-cols-[1.55fr_1fr_1fr_110px] h-[37px] bg-[#f7f6ff] border-b border-[#deddf6] items-center text-[13px] font-semibold text-[var(--color-text)]">
+        <div className="mt-[17px] border border-[#deddf6] rounded-[7px] overflow-x-auto min-w-0">
+          <div className="min-w-[700px]">
+            <div className="grid grid-cols-[1.55fr_1fr_1fr_110px] h-[37px] bg-[#f7f6ff] border-b border-[#deddf6] items-center text-[13px] font-semibold text-[var(--color-text)]">
             <div className="px-[18px]">Item Name {requiredMark}</div>
             <div className="px-[28px]">Quantity {requiredMark}</div>
             <div className="px-[26px]">Expected Date {requiredMark}</div>
@@ -263,11 +274,12 @@ const NewItemRequestForm = ({ mode = 'add', initialData = null, onCancel, onUpda
                   <Icons.Delete className="text-[14px]" />
                 </button>
               </div>
-            </div>
-          ))}
+              </div>
+            ))}
+          </div>
         </div>
 
-        <div className="mt-[22px] border-t border-[#deddf6] pt-[15px] flex justify-center gap-[11px]">
+        <div className="mt-[22px] border-t border-[#deddf6] pt-[15px] flex flex-wrap justify-center gap-[11px]">
           <button
             type="button"
             onClick={onCancel}

@@ -33,8 +33,8 @@ const GeneralSettings = () => {
 
   return (
     <div className="flex flex-col gap-[15px]">
-      <div className="flex gap-[30px]">
-        <label className="flex-1 max-w-[400px]">
+      <div className="flex flex-col sm:flex-row gap-[15px] sm:gap-[30px]">
+        <label className="flex-1 w-full max-w-[400px]">
           <FieldLabel>Cafe Name</FieldLabel>
           <input
             type="text"
@@ -46,7 +46,7 @@ const GeneralSettings = () => {
           />
         </label>
 
-        <label className="flex-1 max-w-[400px]">
+        <label className="flex-1 w-full max-w-[400px]">
           <FieldLabel>Time Format</FieldLabel>
           <div className="relative">
             <select

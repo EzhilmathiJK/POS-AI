@@ -13,7 +13,7 @@ const QuickActions = () => {
     <div className="bg-white rounded-[8px] border border-[var(--color-border)] shadow-[0_1px_2px_rgba(3,4,90,0.04)] p-[12px] h-full flex flex-col">
       <h2 className="text-[13px] font-bold text-[var(--color-text)] mb-[10px] shrink-0">Quick Actions</h2>
 
-      <div className="flex-1 grid grid-cols-5 gap-[8px] min-h-0">
+      <div className="flex-1 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-[8px] min-h-[160px] lg:min-h-0">
         {actions.map((action, index) => (
           <button 
             key={index}

@@ -15,38 +15,38 @@ const itemOptions = [
 
 const dateFilters = ['Today', 'Yesterday', 'This Week', 'This Month', 'Custom'];
 
-const SelectField = ({ label, placeholder, options, className }) => (
-  <label className={`block ${className || ''}`}>
-    <span className="block text-[13px] leading-[14px] font-semibold text-[var(--color-text)] mb-[7px]">{label}</span>
-    <div className="relative">
+const SelectField = ({ label, placeholder, options }) => (
+  <div className="flex flex-col gap-[7px] w-full">
+    <span className="text-[13px] leading-[14px] font-semibold text-[var(--color-text)]">{label}</span>
+    <div className="relative w-full h-[42px] flex items-center">
       <select
         defaultValue=""
-        style={{ fontSize: '12px', fontWeight: 400 }}
-        className="w-full h-[42px] appearance-none bg-white rounded-[6px] border border-[#deddf6] text-[var(--color-primary)] focus:outline-none focus:border-[var(--color-primary)] pl-[16px] pr-[34px] cursor-pointer font-semibold"
+        style={{ fontSize: '12px', fontWeight: 600 }}
+        className="w-full h-full appearance-none bg-white rounded-[6px] border border-[#deddf6] text-[var(--color-primary)] focus:outline-none focus:border-[var(--color-primary)] pl-[16px] pr-[34px] cursor-pointer"
       >
         <option value="" disabled hidden>{placeholder}</option>
         {options.map((option) => (
           <option key={option} value={option}>{option}</option>
         ))}
       </select>
-      <Icons.ChevronDown className="absolute right-[12px] top-[14px] text-[12px] text-[#9b9ab1] pointer-events-none" />
+      <Icons.ChevronDown className="absolute right-[12px] text-[12px] text-[#9b9ab1] pointer-events-none" />
     </div>
-  </label>
+  </div>
 );
 
-const DateField = ({ label, className }) => (
-  <label className={`block ${className || ''}`}>
-    <span className="block text-[13px] leading-[14px] font-semibold text-[var(--color-text)] mb-[7px]">{label}</span>
-    <div className="relative">
+const DateField = ({ label }) => (
+  <div className="flex flex-col gap-[7px] w-full">
+    <span className="text-[13px] leading-[14px] font-semibold text-[var(--color-text)]">{label}</span>
+    <div className="relative w-full h-[42px] flex items-center">
       <input
         type="date"
         onClick={(event) => event.currentTarget.showPicker?.()}
         style={{ fontSize: '12px', fontWeight: 600 }}
-        className="w-full h-[42px] bg-white rounded-[6px] border border-[#deddf6] pl-[12px] pr-[34px] text-[var(--color-primary)] focus:outline-none focus:border-[var(--color-primary)] cursor-pointer [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:cursor-pointer"
+        className="w-full h-full bg-white rounded-[6px] border border-[#deddf6] pl-[12px] pr-[34px] text-[var(--color-primary)] focus:outline-none focus:border-[var(--color-primary)] cursor-pointer [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:cursor-pointer"
       />
-      <Icons.Calendar className="absolute right-[12px] top-[12px] text-[15px] text-[var(--color-primary)] pointer-events-none" />
+      <Icons.Calendar className="absolute right-[12px] text-[15px] text-[var(--color-primary)] pointer-events-none" />
     </div>
-  </label>
+  </div>
 );
 
 const SalesReportFilters = () => {
@@ -54,12 +54,13 @@ const SalesReportFilters = () => {
   const isCustom = activeDateFilter === 'Custom';
 
   return (
-    <section className="bg-white rounded-[6px] border border-[var(--color-border)] shadow-[0_1px_2px_rgba(3,4,90,0.04)] px-[20px] py-[20px] shrink-0 h-auto min-h-[106px] transition-all duration-200">
-      <div className="flex flex-wrap items-end gap-[32px] gap-y-[20px]">
-        <SelectField label="Item" placeholder="Select item" options={itemOptions} className="flex-[0.5] min-w-[150px] max-w-[255px]" />
+    <div className="w-full bg-white rounded-[6px] border border-[var(--color-border)] shadow-[0_1px_2px_rgba(3,4,90,0.04)] px-[20px] py-[20px] box-border shrink-0 min-h-[106px] transition-all duration-200">
+      <div className="w-full grid grid-cols-1 lg:grid-cols-[255px_1fr_minmax(200px,auto)] gap-[20px] lg:gap-[32px] items-end min-w-0">
+        
+        <SelectField label="Item" placeholder="Select item" options={itemOptions} />
 
-        <div className="flex-[2] min-w-[300px] max-w-[542px]">
-          <span className="block text-[13px] leading-[14px] font-semibold text-[var(--color-text)] mb-[7px]">Reported Date</span>
+        <div className="w-full flex flex-col gap-[7px]">
+          <span className="text-[13px] leading-[14px] font-semibold text-[var(--color-text)]">Reported Date</span>
           <div className="flex w-full h-[42px] rounded-[6px] border border-[#deddf6] overflow-hidden">
             {dateFilters.map((filter) => (
               <button
@@ -71,7 +72,7 @@ const SalesReportFilters = () => {
                   activeDateFilter === filter
                     ? 'bg-[#dfe4ea] text-[var(--color-primary)]'
                     : 'bg-white text-[var(--color-primary)] hover:bg-[#f7f6ff]'
-                }`}
+                } whitespace-nowrap px-[4px]`}
               >
                 {filter}
               </button>
@@ -79,12 +80,12 @@ const SalesReportFilters = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-[12px] ml-auto">
-          <button style={{ fontSize: '14px' }} className="h-[42px] w-[94px] rounded-[6px] bg-[var(--color-primary)] text-white flex items-center justify-center gap-[8px] font-bold hover:bg-[var(--color-primary-hover)] shrink-0">
+        <div className="grid grid-cols-2 gap-[12px] w-full min-w-0 lg:ml-auto">
+          <button style={{ fontSize: '14px' }} className="h-[42px] rounded-[6px] bg-[var(--color-primary)] text-white flex items-center justify-center gap-[8px] font-bold hover:bg-[var(--color-primary-hover)] shrink-0 cursor-pointer whitespace-nowrap">
             <Icons.Filter className="text-[15px]" />
             Filter
           </button>
-          <button style={{ fontSize: '14px' }} className="h-[42px] w-[96px] rounded-[6px] bg-white text-[var(--color-text)] border border-[#deddf6] flex items-center justify-center gap-[8px] font-bold hover:bg-gray-50 shrink-0">
+          <button style={{ fontSize: '14px' }} className="h-[42px] rounded-[6px] bg-white text-[var(--color-text)] border border-[#deddf6] flex items-center justify-center gap-[8px] font-bold hover:bg-gray-50 shrink-0 cursor-pointer whitespace-nowrap">
             <Icons.Reset className="text-[14px]" />
             Reset
           </button>
@@ -92,14 +93,13 @@ const SalesReportFilters = () => {
       </div>
 
       {isCustom && (
-        <div className="mt-[20px] pt-[20px] border-t border-[var(--color-border)] flex flex-wrap justify-center gap-[32px]">
-          <DateField label="Reported Date From" className="flex-1 min-w-[200px] max-w-[320px]" />
-          <DateField label="Reported Date To" className="flex-1 min-w-[200px] max-w-[320px]" />
+        <div className="mt-[20px] pt-[20px] border-t border-[var(--color-border)] w-full grid grid-cols-1 sm:grid-cols-2 gap-[20px] lg:gap-[32px]">
+          <DateField label="Reported Date From" />
+          <DateField label="Reported Date To" />
         </div>
       )}
-    </section>
+    </div>
   );
 };
 
 export default SalesReportFilters;
-

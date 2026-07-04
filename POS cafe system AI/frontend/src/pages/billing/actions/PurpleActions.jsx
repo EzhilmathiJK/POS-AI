@@ -7,33 +7,33 @@ const PurpleActions = ({ onNewBill, onPriceAmendmentClick }) => {
       <button
         type="button"
         onClick={onNewBill}
-        className="w-[113px] flex flex-col items-center justify-center hover:bg-[#7435dc] border-r border-[var(--color-purple-action-border)] transition-colors"
+        className="w-[28%] xl:w-[113px] shrink-0 flex flex-col items-center justify-center hover:bg-[#7435dc] border-r border-[var(--color-purple-action-border)] transition-colors"
       >
-        <Icons.NewBill className="text-[26px] mb-[9px]" />
-        <span className="text-[10px] font-semibold leading-[11px]">New Bill</span>
+        <Icons.NewBill className="text-[24px] xl:text-[26px] mb-[9px]" />
+        <span className="text-[9px] xl:text-[10px] font-semibold leading-[11px]">New Bill</span>
       </button>
 
       <button 
         type="button"
         onClick={onPriceAmendmentClick}
-        className="w-[113px] flex flex-col items-center justify-center hover:bg-[#7435dc] border-r border-[var(--color-purple-action-border)] transition-colors"
+        className="w-[28%] xl:w-[113px] shrink-0 flex flex-col items-center justify-center hover:bg-[#7435dc] border-r border-[var(--color-purple-action-border)] transition-colors"
       >
-        <Icons.PriceAmendment className="text-[27px] mb-[9px]" />
-        <span className="text-[10px] font-semibold leading-[11px]">Price Amendment</span>
+        <Icons.PriceAmendment className="text-[25px] xl:text-[27px] mb-[9px]" />
+        <span className="text-[9px] xl:text-[10px] text-center font-semibold leading-[11px] px-[2px]">Price Amendment</span>
       </button>
 
-      <div className="w-[162px] grid grid-cols-2 grid-rows-2 text-center text-[14px] font-semibold">
+      <div className="w-[30%] xl:w-[162px] shrink-0 grid grid-cols-2 grid-rows-2 text-center text-[12px] xl:text-[14px] font-semibold">
         <button className="border-r border-b border-[var(--color-purple-action-border)] hover:bg-[#7435dc] flex items-center justify-center">₹2</button>
         <button className="border-b border-[var(--color-purple-action-border)] hover:bg-[#7435dc] flex items-center justify-center">₹5</button>
         <button className="border-r border-[var(--color-purple-action-border)] hover:bg-[#7435dc] flex items-center justify-center">₹20</button>
         <button className="hover:bg-[#7435dc] flex items-center justify-center">₹50</button>
       </div>
 
-      <div className="flex-1 flex flex-col border-l border-[var(--color-purple-action-border)] text-[14px] font-semibold text-center">
+      <div className="flex-1 min-w-[14%] flex flex-col border-l border-[var(--color-purple-action-border)] text-[12px] xl:text-[14px] font-semibold text-center">
         <button className="flex-1 border-b border-[var(--color-purple-action-border)] hover:bg-[#7435dc] flex items-center justify-center">₹10</button>
         <button className="flex-1 flex flex-col items-center justify-center hover:bg-[#7435dc] transition-colors">
-          <Icons.GiftVoucher className="text-[18px] mb-[2px]" />
-          <span className="text-[9px] font-semibold leading-[10px]">Gift Voucher</span>
+          <Icons.GiftVoucher className="text-[16px] xl:text-[18px] mb-[2px]" />
+          <span className="text-[8px] xl:text-[9px] font-semibold leading-[10px] text-center">Gift Voucher</span>
         </button>
       </div>
     </div>

@@ -58,20 +58,20 @@ const MenuSettings = () => {
         <span className="block text-[13px] leading-[16px] font-semibold text-[var(--color-text)] mb-[9px]">
           Add New Category
         </span>
-        <div className="flex items-center gap-[15px]">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-[10px] sm:gap-[15px]">
           <input
             type="text"
             value={newCategoryName}
             onChange={(e) => setNewCategoryName(e.target.value)}
             placeholder="Category name"
             style={{ fontSize: '12px', fontWeight: 400 }}
-            className="flex-1 h-[37px] rounded-[7px] border border-[#deddf6] px-[12px] text-[var(--color-primary)] outline-none focus:border-[var(--color-primary)] bg-white"
+            className="w-full sm:flex-1 shrink-0 h-[37px] rounded-[7px] border border-[#deddf6] px-[12px] text-[var(--color-primary)] outline-none focus:border-[var(--color-primary)] bg-white"
             onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
           />
           <button
             onClick={handleAdd}
             style={{ fontSize: '14px' }}
-            className="h-[37px] px-[20px] rounded-[7px] bg-[var(--color-primary)] font-bold text-white flex items-center justify-center gap-[8px] hover:bg-[var(--color-primary-hover)] shrink-0"
+            className="w-full sm:w-auto h-[37px] px-[20px] rounded-[7px] bg-[var(--color-primary)] font-bold text-white flex items-center justify-center gap-[8px] hover:bg-[var(--color-primary-hover)] shrink-0"
           >
             <Icons.Plus className="text-[16px]" /> Add Category
           </button>

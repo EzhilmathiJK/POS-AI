@@ -51,12 +51,12 @@ const UserSettings = () => {
                 <td className="px-[20px] text-[13px] font-semibold text-[var(--color-text)] capitalize">
                   {role}
                 </td>
-                <td className="px-[20px]">
-                  <div className="flex flex-wrap items-center gap-x-[20px] gap-y-[10px]">
+                <td className="px-[20px] w-auto whitespace-nowrap">
+                  <div className="flex flex-nowrap items-center gap-[20px] py-[5px]">
                     {allPages.map(page => {
                       const isChecked = (localPermissions[role] || []).includes(page);
                       return (
-                        <label key={page} className="flex items-center gap-[6px] cursor-pointer">
+                        <label key={page} className="flex items-center gap-[6px] cursor-pointer shrink-0">
                           <input
                             type="checkbox"
                             checked={isChecked}

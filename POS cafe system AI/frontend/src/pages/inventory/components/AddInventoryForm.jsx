@@ -158,7 +158,7 @@ const AddInventoryForm = ({ mode = 'add', initialData = null, onCancel, onUpdate
   };
 
   return (
-    <section className="flex-1 min-h-0 bg-white rounded-[6px] border border-[var(--color-border)] shadow-[0_1px_2px_rgba(3,4,90,0.04)] px-[154px] pt-[16px] pb-[15px] overflow-y-auto custom-scrollbar">
+    <section className="flex-1 min-h-0 bg-white rounded-[6px] border border-[var(--color-border)] shadow-[0_1px_2px_rgba(3,4,90,0.04)] px-[15px] md:px-[50px] lg:px-[154px] pt-[16px] pb-[15px] overflow-y-auto custom-scrollbar">
       <div className="max-w-[806px] mx-auto">
         <div className="text-center border-b border-[#deddf6] pb-[13px]">
           <h2 className="text-[22px] leading-[27px] font-semibold text-[var(--color-text)]">
@@ -170,7 +170,7 @@ const AddInventoryForm = ({ mode = 'add', initialData = null, onCancel, onUpdate
         </div>
 
         <form className="pt-[16px]" onSubmit={(event) => event.preventDefault()}>
-          <div className="grid grid-cols-2 gap-x-[29px] gap-y-[19px]">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-[29px] gap-y-[19px]">
             <label>
               <FieldLabel>Item Code</FieldLabel>
               <TextInput value={formData.itemCode} readOnly />
@@ -299,7 +299,7 @@ const AddInventoryForm = ({ mode = 'add', initialData = null, onCancel, onUpdate
             </label>
           </div>
 
-          <div className="mt-[30px] flex justify-center gap-[11px]">
+          <div className="mt-[30px] flex flex-wrap justify-center gap-[11px]">
             <button
               type="button"
               onClick={onCancel}
