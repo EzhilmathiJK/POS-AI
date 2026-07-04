@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+  STAFF
+  CASHIER
+}
+
+model User {
+  id         Int      @id @default(autoincrement())
+  full_name  String
+  username   String   @unique
+  email      String   @unique
+  password   String
+  role       Role     @default(STAFF)
+  is_active  Boolean  @default(true)
+  is_deleted Boolean  @default(false)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("users")
+}
+
+model RolePermission {
+  id           Int      @id @default(autoincrement())
+  role         Role     @unique
+  dashboard    Boolean  @default(false)
+  billing      Boolean  @default(false)
+  inventory    Boolean  @default(false)
+  item_request Boolean  @default(false)
+  sales_report Boolean  @default(false)
+  users        Boolean  @default(false)
+  settings     Boolean  @default(false)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  @@map("role_permissions")
+}

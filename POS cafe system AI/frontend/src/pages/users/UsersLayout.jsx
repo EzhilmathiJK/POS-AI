@@ -1,10 +1,10 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Icons } from '../../assets/icons';
 import { useAppContext } from '../../context/AppContext';
-import { initialUsersData } from './usersData';
 import UserFilters from './components/UserFilters';
 import UsersTable from './components/UsersTable';
 import UserFormModal from './components/UserFormModal';
+import api from '../../api/axios';
 
 const UsersTopBar = () => {
   const { toggleSidebar } = useAppContext();
@@ -45,10 +45,41 @@ const UsersTopBar = () => {
   );
 };
 
+const formatApiUser = (user) => ({
+  id: user.id,
+  fullName: user.full_name,
+  username: user.username,
+  email: user.email,
+  role: user.role, // API returns STAFF, ADMIN, MANAGER, CASHIER
+  status: user.is_active ? 'Active' : 'Inactive',
+  createdAt: new Date(user.created_at).toLocaleDateString('en-GB', {
+    day: '2-digit', month: 'short', year: 'numeric'
+  }) + ' ' + new Date(user.created_at).toLocaleTimeString('en-US', {
+    hour: '2-digit', minute: '2-digit', hour12: true
+  }).toUpperCase(),
+});
+
 const UsersLayout = () => {
-  const [users, setUsers] = useState(initialUsersData);
+  const [users, setUsers] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const fetchUsers = async () => {
+    try {
+      const response = await api.get('/users');
+      if (response.data.success) {
+        const mappedUsers = response.data.data.users.map(formatApiUser);
+        setUsers(mappedUsers);
+      }
+    } catch (error) {
+      console.error("Failed to fetch users", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   const [filterValues, setFilterValues] = useState({
     search: '',
@@ -75,7 +106,8 @@ const UsersLayout = () => {
         user.fullName.toLowerCase().includes(searchLower) || 
         user.email.toLowerCase().includes(searchLower);
 
-      const matchesRole = filterValues.role === 'All Roles' || user.role === filterValues.role;
+      // We compare case insensitively because API role is STAFF, filter is Staff
+      const matchesRole = filterValues.role === 'All Roles' || user.role.toLowerCase() === filterValues.role.toLowerCase();
       const matchesStatus = filterValues.status === 'All Status' || user.status === filterValues.status;
 
       return matchesSearch && matchesRole && matchesStatus;
@@ -92,24 +124,32 @@ const UsersLayout = () => {
     setIsModalOpen(true);
   };
 
-  const handleSaveUser = (userData) => {
-    if (editingUser) {
-      setUsers(prev => prev.map(u => u.id === userData.id ? { ...u, ...userData } : u));
-    } else {
-      const newUser = {
-        ...userData,
-        createdAt: new Date().toLocaleDateString('en-GB', {
-          day: '2-digit', month: 'short', year: 'numeric'
-        }) + ' ' + new Date().toLocaleTimeString('en-US', {
-          hour: '2-digit', minute: '2-digit', hour12: true
-        }).toUpperCase(),
-      };
-      setUsers(prev => [...prev, newUser]);
+  const handleSaveUser = async (userData) => {
+    try {
+      if (editingUser) {
+        // PUT /api/users/:id implementation left out for now
+        // setUsers(prev => prev.map(u => u.id === userData.id ? { ...u, ...userData } : u));
+      } else {
+        const payload = {
+          full_name: userData.fullName,
+          username: userData.username,
+          email: userData.email,
+          password: userData.password,
+          role: userData.role.toUpperCase(), // Map "Staff" to "STAFF"
+        };
+        const response = await api.post('/users', payload);
+        if (response.data.success) {
+          fetchUsers(); // Refresh the list
+        }
+      }
+      setIsModalOpen(false);
+    } catch (error) {
+      alert(error.response?.data?.message || 'Error saving user');
     }
-    setIsModalOpen(false);
   };
 
   const handleDeleteUser = (id) => {
+    // DELETE /api/users/:id implementation left out for now
     setUsers(prev => prev.filter(u => u.id !== id));
   };
 
