@@ -8,6 +8,9 @@ const server = app.listen(PORT, () => {
   console.log(`[Server]: Running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
 });
 
+
+// Force restart for Prisma Client update
+
 // Force keep-alive for debugging
 setInterval(() => {}, 1000 * 60 * 60);
 

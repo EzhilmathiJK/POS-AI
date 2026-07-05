@@ -5,7 +5,7 @@ import {
   FiBox, FiTag, FiCalendar, FiChevronDown, FiFilter, FiRefreshCw,
   FiDownload, FiUpload, FiChevronLeft, FiChevronRight, FiChevronsLeft,
   FiChevronsRight, FiInfo, FiSave, FiEye, FiSend, FiUser, FiLock,
-  FiEyeOff, FiShield, FiCheck, FiMail, FiEdit, FiBell
+  FiEyeOff, FiShield, FiCheck, FiMail, FiEdit, FiBell, FiAlertTriangle, FiArrowRight
 } from 'react-icons/fi';
 import { MdOutlineFastfood, MdOutlineRamenDining, MdOutlineRiceBowl } from 'react-icons/md';
 import { BiCoffeeTogo, BiReceipt } from 'react-icons/bi';
@@ -25,6 +25,8 @@ export const Icons = {
   Settings: FiSettings,
   Help: FiHelpCircle,
   Logout: FiLogOut,
+  Warning: FiAlertTriangle,
+  ArrowRight: FiArrowRight,
 
   // Top Bar
   Menu: FiMenu,

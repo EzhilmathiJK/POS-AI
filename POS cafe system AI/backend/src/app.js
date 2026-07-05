@@ -14,6 +14,10 @@ app.use(express.urlencoded({ extended: true }));
 // 2. Logging
 app.use(morgan('dev'));
 
+// Serve uploads folder
+import path from 'path';
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+
 // 3. Rate Limiting (Basic Protection)
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -27,8 +31,15 @@ app.use('/api', apiLimiter);
 // 4. API Routes
 import authRoutes from './modules/auth/auth.routes.js';
 import usersRoutes from './modules/users/users.routes.js';
+import settingsRoutes from './modules/settings/settings.routes.js';
+import inventoryRoutes from './modules/inventory/inventory.routes.js';
+import billingRoutes from './modules/billing/billing.routes.js';
+
 app.use('/api/auth', authRoutes);
 app.use('/api/users', usersRoutes);
+app.use('/api/settings', settingsRoutes);
+app.use('/api/inventory', inventoryRoutes);
+app.use('/api/billing', billingRoutes);
 
 // 5. 404 Handler for undefined routes
 app.use((req, res, next) => {

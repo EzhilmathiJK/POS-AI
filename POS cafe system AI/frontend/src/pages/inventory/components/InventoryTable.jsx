@@ -47,15 +47,15 @@ const EntriesSelect = () => (
   </div>
 );
 
-const InventoryTable = ({ onAddItem, onEditItem }) => {
+const InventoryTable = ({ items = [], loading, onAddItem, onEditItem }) => {
   return (
-    <div className="w-full flex-1 min-h-[520px] lg:min-h-0 flex flex-col bg-white rounded-[6px] border border-[var(--color-border)] overflow-hidden min-w-0 shrink-0">
+    <div className="w-full flex-1 min-h-[520px] lg:min-h-0 flex flex-col bg-white rounded-[6px] border border-[var(--color-border)] overflow-hidden min-w-0 shrink-0 relative">
 
       {/* Header: Title + Action Buttons */}
       <div className="w-full px-[17px] pt-[16px] pb-[10px] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-[14px] shrink-0">
         <div className="flex flex-row items-center justify-between sm:flex-col sm:items-start gap-[2px]">
           <h2 className="text-[13px] leading-[19px] font-semibold text-[var(--color-text)]">Inventory List</h2>
-          <span className="text-[12px] leading-[18px] font-normal text-[var(--color-primary)]">Total 10 items found</span>
+          <span className="text-[12px] leading-[18px] font-normal text-[var(--color-primary)]">Total {items.length} items found</span>
         </div>
 
         <div className="grid grid-cols-3 gap-[8px] sm:flex sm:items-center sm:gap-[10px] w-full sm:w-auto">
@@ -93,31 +93,55 @@ const InventoryTable = ({ onAddItem, onEditItem }) => {
             </tr>
           </thead>
           <tbody>
-            {inventoryItems.map((item) => (
-              <tr key={item.name} className="h-[48px] border-b border-[#deddf6] last:border-b-0 hover:bg-gray-50 transition-colors">
+            {loading ? (
+              <tr>
+                <td colSpan={columns.length} className="h-[100px] text-center text-[13px] text-[var(--color-primary)] font-semibold">
+                  Loading inventory...
+                </td>
+              </tr>
+            ) : items.length === 0 ? (
+              <tr>
+                <td colSpan={columns.length} className="h-[100px] text-center text-[13px] text-[var(--color-primary)] font-semibold">
+                  No items found. Click "Add Item" to create one.
+                </td>
+              </tr>
+            ) : items.map((item) => (
+              <tr key={item.id} className="h-[48px] border-b border-[#deddf6] last:border-b-0 hover:bg-gray-50 transition-colors">
                 <td className="px-[18px] font-normal whitespace-nowrap">
                   <div className="flex items-center gap-[13px]">
-                    <img src={item.image} alt={item.name} className="w-[18px] h-[22px] object-contain shrink-0" />
+                    <img 
+                      src={
+                        !item.image_url || item.image_url === '/default-image.png'
+                          ? '/default-image.png'
+                          : item.image_url.startsWith('http')
+                          ? item.image_url
+                          : `http://localhost:8000${item.image_url}`
+                      } 
+                      alt={item.item_name} 
+                      className="w-[18px] h-[22px] object-contain shrink-0" 
+                    />
                     <button 
                       onClick={() => onEditItem(item)}
-                      className="text-[var(--color-text)] hover:underline hover:text-[var(--color-primary)] cursor-pointer"
+                      className="text-[var(--color-text)] hover:underline hover:text-[var(--color-primary)] cursor-pointer text-left"
                     >
-                      {item.name}
+                      {item.item_name}
                     </button>
                   </div>
                 </td>
                 <td className="px-[18px] font-normal text-[var(--color-primary)] whitespace-nowrap">{item.category}</td>
-                <td className="px-[18px] font-normal whitespace-nowrap">{item.price}</td>
+                <td className="px-[18px] font-normal whitespace-nowrap">${Number(item.price).toFixed(2)}</td>
                 <td className="px-[18px] font-normal text-[var(--color-primary)] whitespace-nowrap">{item.unit}</td>
                 <td className="px-[18px] font-normal whitespace-nowrap text-center">{item.purchased}</td>
                 <td className="px-[18px] font-normal whitespace-nowrap text-center">{item.sold}</td>
-                <td className={`px-[18px] font-normal whitespace-nowrap text-center ${stockClass(item.status)}`}>{item.inStock}</td>
+                <td className={`px-[18px] font-normal whitespace-nowrap text-center ${stockClass(item.status)}`}>{item.in_stock}</td>
                 <td className="px-[18px] font-normal whitespace-nowrap">
                   <span className={`inline-flex items-center justify-center h-[24px] rounded-[5px] px-[10px] text-[12px] font-semibold ${statusClasses[item.status]}`}>
                     {item.status}
                   </span>
                 </td>
-                <td className="px-[18px] font-normal text-[var(--color-primary)] whitespace-nowrap">{item.lastUpdated}</td>
+                <td className="px-[18px] font-normal text-[var(--color-primary)] whitespace-nowrap">
+                  {new Date(item.updated_at).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' })}
+                </td>
               </tr>
             ))}
           </tbody>

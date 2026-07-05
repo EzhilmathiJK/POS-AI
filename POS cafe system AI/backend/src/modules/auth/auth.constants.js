@@ -1,8 +1,8 @@
 export const ROLES = {
-  ADMIN: 'ADMIN',
-  MANAGER: 'MANAGER',
-  STAFF: 'STAFF',
-  CASHIER: 'CASHIER',
+  ADMIN: 'Admin',
+  MANAGER: 'Manager',
+  STAFF: 'Staff',
+  CASHIER: 'Cashier',
 };
 
 // Default permissions applied when a role is first created

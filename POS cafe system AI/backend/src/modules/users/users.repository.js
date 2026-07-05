@@ -16,3 +16,19 @@ export const getAllUsers = async () => {
     }
   });
 };
+
+export const updateUser = async (id, data) => {
+  return await prisma.user.update({
+    where: { id: Number(id) },
+    data,
+    select: {
+      id: true,
+      full_name: true,
+      username: true,
+      email: true,
+      role: true,
+      is_active: true,
+      created_at: true,
+    }
+  });
+};

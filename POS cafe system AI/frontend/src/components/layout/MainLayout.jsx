@@ -1,7 +1,6 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
-import Toast from '../ui/Toast';
 
 const MainLayout = () => {
   return (
@@ -10,7 +9,6 @@ const MainLayout = () => {
       <main className="flex-1 ml-0 lg:ml-[178px] h-full overflow-hidden flex flex-col transition-all duration-300">
         <Outlet />
       </main>
-      <Toast />
     </div>
   );
 };

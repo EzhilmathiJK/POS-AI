@@ -25,3 +25,17 @@ export const createUser = async (req, res, next) => {
     next(error);
   }
 };
+
+export const updateUser = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const updatedUser = await usersService.modifyUser(id, req.body);
+    res.status(200).json({
+      success: true,
+      message: 'User updated successfully',
+      data: { user: updatedUser },
+    });
+  } catch (error) {
+    next(error);
+  }
+};

@@ -39,3 +39,32 @@ export const createNewUser = async (userData) => {
   const { password: _, ...userWithoutPassword } = newUser;
   return userWithoutPassword;
 };
+
+export const modifyUser = async (id, updateData) => {
+  const { full_name, username, email, password, role, is_active } = updateData;
+
+  // Build the data object for update
+  const data = {};
+  if (full_name) data.full_name = full_name;
+  if (role) data.role = role;
+  if (is_active !== undefined) data.is_active = is_active;
+  if (username) data.username = username;
+  if (email) data.email = email;
+
+  if (password && password.trim() !== '') {
+    data.password = await bcrypt.hash(password, 12);
+  }
+
+  // Handle unique constraints safely
+  try {
+    return await usersRepo.updateUser(id, data);
+  } catch (error) {
+    if (error.code === 'P2002') {
+      const field = error.meta?.target?.[0] || 'Field';
+      const customError = new Error(`${field} is already in use`);
+      customError.statusCode = 400;
+      throw customError;
+    }
+    throw error;
+  }
+};

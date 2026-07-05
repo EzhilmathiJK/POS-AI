@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useCallback } from 'react';
+import { toast as toastify } from 'react-toastify';
 import { Icons } from '../assets/icons';
 
 const AppContext = createContext();
@@ -24,31 +25,40 @@ export const AppProvider = ({ children }) => {
     { id: '7', name: 'Porridge', iconName: 'Porridge' },
   ]);
 
-  // Role Permissions
-  // Allowed pages for each role
-  const [rolePermissions, setRolePermissions] = useState({
-    admin: ['Dashboard', 'Billing', 'Inventory', 'Item Request', 'Sales Report', 'Users', 'Settings'],
-    manager: ['Dashboard', 'Billing', 'Inventory', 'Item Request', 'Sales Report'],
-    cashier: ['Dashboard', 'Billing', 'Sales Report'],
-    staff: ['Dashboard', 'Billing'],
+  // Allowed pages for current user
+  const [currentPermissions, setCurrentPermissions] = useState(() => {
+    const stored = localStorage.getItem('permissions');
+    return stored ? JSON.parse(stored) : {};
   });
 
-  // Current logged in user mock
-  const [currentUser] = useState({ role: 'admin' });
+  // Current logged in user
+  const [currentUser, setCurrentUser] = useState(() => {
+    const stored = localStorage.getItem('user');
+    return stored ? JSON.parse(stored) : null;
+  });
 
   // Global Toast State
-  const [toast, setToast] = useState(null);
+  const [toast, setToast] = useState(null); // Keep state for backward compatibility if any component reads it directly, though we should just use react-toastify
 
-  const showToast = (message, type = 'success') => {
-    setToast({ message, type });
-    setTimeout(() => {
-      setToast(null);
-    }, 3000);
-  };
+  const showToast = useCallback((message, type = 'success') => {
+    if (type === 'success') {
+      toastify.success(message);
+    } else if (type === 'error') {
+      toastify.error(message);
+    } else if (type === 'warning') {
+      toastify.warning(message);
+    } else {
+      toastify.info(message);
+    }
+  }, []);
 
   // Sidebar Toggle State
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const toggleSidebar = () => setIsSidebarOpen(prev => !prev);
+  const toggleSidebar = useCallback(() => setIsSidebarOpen(prev => !prev), []);
+
+  // Unauthorized Modal State
+  const [unauthorizedState, setUnauthorizedState] = useState({ isOpen: false, type: null });
+  const triggerUnauthorized = useCallback((type) => setUnauthorizedState({ isOpen: true, type }), []);
 
   return (
     <AppContext.Provider value={{
@@ -56,14 +66,18 @@ export const AppProvider = ({ children }) => {
       setSettings,
       categories,
       setCategories,
-      rolePermissions,
-      setRolePermissions,
+      currentPermissions,
+      setCurrentPermissions,
       currentUser,
+      setCurrentUser,
       toast,
       showToast,
       isSidebarOpen,
       setIsSidebarOpen,
-      toggleSidebar
+      toggleSidebar,
+      unauthorizedState,
+      setUnauthorizedState,
+      triggerUnauthorized
     }}>
       {children}
     </AppContext.Provider>

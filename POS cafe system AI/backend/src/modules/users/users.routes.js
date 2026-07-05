@@ -11,5 +11,6 @@ router.use(authorize('users'));
 
 router.get('/', usersController.getUsers);
 router.post('/', usersController.createUser);
+router.put('/:id', usersController.updateUser);
 
 export default router;

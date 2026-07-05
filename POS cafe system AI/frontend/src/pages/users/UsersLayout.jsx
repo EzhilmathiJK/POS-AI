@@ -127,15 +127,27 @@ const UsersLayout = () => {
   const handleSaveUser = async (userData) => {
     try {
       if (editingUser) {
-        // PUT /api/users/:id implementation left out for now
-        // setUsers(prev => prev.map(u => u.id === userData.id ? { ...u, ...userData } : u));
+        const payload = {
+          full_name: userData.fullName,
+          username: userData.username,
+          email: userData.email,
+          role: userData.role, 
+          is_active: userData.status === 'Active',
+        };
+        if (userData.password) {
+          payload.password = userData.password;
+        }
+        const response = await api.put(`/users/${editingUser.id}`, payload);
+        if (response.data.success) {
+          fetchUsers(); // Refresh the list
+        }
       } else {
         const payload = {
           full_name: userData.fullName,
           username: userData.username,
           email: userData.email,
           password: userData.password,
-          role: userData.role.toUpperCase(), // Map "Staff" to "STAFF"
+          role: userData.role, 
         };
         const response = await api.post('/users', payload);
         if (response.data.success) {

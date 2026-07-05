@@ -7,10 +7,10 @@ datasource db {
 }
 
 enum Role {
-  ADMIN
-  MANAGER
-  STAFF
-  CASHIER
+  Admin
+  Manager
+  Staff
+  Cashier
 }
 
 model User {
@@ -19,7 +19,7 @@ model User {
   username   String   @unique
   email      String   @unique
   password   String
-  role       Role     @default(STAFF)
+  role       Role     @default(Staff)
   is_active  Boolean  @default(true)
   is_deleted Boolean  @default(false)
   created_at DateTime @default(now())
@@ -42,4 +42,58 @@ model RolePermission {
   updated_at   DateTime @updatedAt
 
   @@map("role_permissions")
+}
+
+model Inventory {
+  id          Int      @id @default(autoincrement())
+  item_number String   @unique
+  item_name   String   @unique
+  image_url   String?  @default("/default-image.png")
+  description String?
+  category    String
+  unit        String
+  price       Decimal  @db.Decimal(10, 2)
+  purchased   Int      @default(0)
+  sold        Int      @default(0)
+  in_stock    Int      @default(0)
+  status      String   @default("Out of Stock")
+  supplier    String?
+  is_deleted  Boolean  @default(false)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  bill_items  BillItem[]
+
+  @@map("inventory")
+}
+
+model Bill {
+  id             Int        @id @default(autoincrement())
+  bill_number    String     @unique
+  total_amount   Decimal    @db.Decimal(10, 2)
+  tender_amount  Decimal    @db.Decimal(10, 2)
+  balance_amount Decimal    @db.Decimal(10, 2)
+  items          BillItem[]
+  created_at     DateTime   @default(now())
+  updated_at     DateTime   @updatedAt
+
+  @@map("bills")
+}
+
+model BillItem {
+  id           Int       @id @default(autoincrement())
+  bill_id      Int
+  inventory_id Int
+  item_number  String
+  item_name    String
+  quantity     Int
+  unit_price   Decimal   @db.Decimal(10, 2)
+  total_price  Decimal   @db.Decimal(10, 2)
+
+  bill         Bill      @relation(fields: [bill_id], references: [id], onDelete: Cascade)
+  inventory    Inventory @relation(fields: [inventory_id], references: [id])
+  
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+
+  @@map("bill_items")
 }

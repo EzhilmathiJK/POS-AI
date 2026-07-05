@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Icons } from '../../assets/icons';
 import api from '../../api/axios';
+import { useAppContext } from '../../context/AppContext';
 import './LoginPage.css';
 
 const LoginPage = () => {
   const [authMode, setAuthMode] = useState('login');
   const navigate = useNavigate();
+  const { setCurrentUser, setCurrentPermissions, showToast } = useAppContext();
   const isRegistering = authMode === 'register';
 
   // Form states
@@ -48,6 +50,9 @@ const LoginPage = () => {
         localStorage.setItem('user', JSON.stringify(user));
         localStorage.setItem('permissions', JSON.stringify(permissions));
         
+        setCurrentUser(user);
+        setCurrentPermissions(permissions);
+        
         navigate('/dashboard');
       }
     } catch (err) {
@@ -85,7 +90,7 @@ const LoginPage = () => {
           password: '',
           confirmPassword: '',
         });
-        alert('Registration successful! Please sign in.');
+        showToast('Registration successful! Please sign in.', 'success');
       }
     } catch (err) {
       if (err.response?.data?.errors?.length > 0) {

@@ -1,22 +1,37 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { Icons } from '../../assets/icons';
 import { useAppContext } from '../../context/AppContext';
 
 const Sidebar = () => {
-  const { rolePermissions, currentUser, isSidebarOpen, setIsSidebarOpen } = useAppContext();
+  const { currentPermissions, currentUser, setCurrentUser, setCurrentPermissions, isSidebarOpen, setIsSidebarOpen } = useAppContext();
+  const navigate = useNavigate();
 
   const allNavItems = [
-    { name: 'Dashboard', path: '/dashboard', icon: Icons.Dashboard },
-    { name: 'Billing', path: '/billing', icon: Icons.Billing },
-    { name: 'Inventory', path: '/inventory', icon: Icons.Inventory },
-    { name: 'Item Request', path: '/item-request', icon: Icons.ItemRequest },
-    { name: 'Sales Report', path: '/sales-report', icon: Icons.SalesReport },
-    { name: 'Users', path: '/users', icon: Icons.Users },
-    { name: 'Settings', path: '/settings', icon: Icons.Settings },
+    { name: 'Dashboard', pageKey: 'dashboard', path: '/dashboard', icon: Icons.Dashboard },
+    { name: 'Billing', pageKey: 'billing', path: '/billing', icon: Icons.Billing },
+    { name: 'Inventory', pageKey: 'inventory', path: '/inventory', icon: Icons.Inventory },
+    { name: 'Item Request', pageKey: 'item_request', path: '/item-request', icon: Icons.ItemRequest },
+    { name: 'Sales Report', pageKey: 'sales_report', path: '/sales-report', icon: Icons.SalesReport },
+    { name: 'Users', pageKey: 'users', path: '/users', icon: Icons.Users },
+    { name: 'Settings', pageKey: 'settings', path: '/settings', icon: Icons.Settings },
   ];
 
-  const allowedPages = rolePermissions[currentUser.role.toLowerCase()] || [];
-  const navItems = allNavItems.filter(item => allowedPages.includes(item.name));
+  const navItems = allNavItems.filter(item => currentPermissions[item.pageKey] === true);
+
+  const handleLogout = () => {
+    // Clear localStorage
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('user');
+    localStorage.removeItem('permissions');
+    
+    // Clear Context
+    setCurrentUser(null);
+    setCurrentPermissions({});
+    
+    // Navigate to Login
+    navigate('/login', { replace: true });
+  };
 
   return (
     <>
@@ -65,19 +80,19 @@ const Sidebar = () => {
             <Icons.Help className="text-[15px] shrink-0" />
             <span className="font-bold text-[12px] leading-none">Help & Support</span>
           </a>
-          <NavLink to="/login" className="flex items-center gap-[14px] h-[35px] px-[23px] rounded-[6px] text-white hover:bg-[#20235a] transition-colors">
+          <button onClick={handleLogout} className="w-full flex items-center gap-[14px] h-[35px] px-[23px] rounded-[6px] text-white hover:bg-[#20235a] transition-colors">
             <Icons.Logout className="text-[15px] shrink-0" />
             <span className="font-bold text-[12px] leading-none">Logout</span>
-          </NavLink>
+          </button>
         </div>
 
         <div className="h-[71px] px-[24px] flex items-center gap-[11px]">
-          <div className="w-[37px] h-[37px] rounded-full bg-[var(--color-primary)] flex items-center justify-center text-white font-bold text-[19px]">
-            A
+          <div className="w-[37px] h-[37px] rounded-full bg-[var(--color-primary)] flex items-center justify-center text-white font-bold text-[19px] uppercase">
+            {currentUser?.full_name ? currentUser.full_name.charAt(0) : 'A'}
           </div>
           <div>
-            <p className="text-[13px] font-extrabold leading-[15px]">Admin</p>
-            <p className="text-[12px] text-white leading-[15px]">Administrator</p>
+            <p className="text-[13px] font-extrabold leading-[15px] capitalize">{currentUser?.role?.toLowerCase() || 'Admin'}</p>
+            <p className="text-[12px] text-white leading-[15px]">{currentUser?.full_name || 'Administrator'}</p>
           </div>
         </div>
       </aside>

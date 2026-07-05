@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Icons } from '../../../assets/icons';
 import ActionModal from '../../../components/ui/ActionModal';
 import { useAppContext } from '../../../context/AppContext';
+import api from '../../../api/axios';
 
 const requiredMark = <span className="text-[#ff1e27]">*</span>;
 
@@ -82,34 +83,44 @@ const AddInventoryForm = ({ mode = 'add', initialData = null, onCancel, onUpdate
     supplier: ''
   });
   const [imagePreview, setImagePreview] = useState(null);
-  const { showToast } = useAppContext();
-  const [modalState, setModalState] = useState({ isOpen: false, type: '', step: '' });
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [errors, setErrors] = useState({});
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     if (mode === 'edit' && initialData) {
       setFormData({
-        itemCode: initialData.code || '',
-        itemName: initialData.name || '',
-        itemImage: initialData.image || null,
+        itemCode: initialData.item_number || '',
+        itemName: initialData.item_name || '',
+        itemImage: initialData.image_url || null,
         itemDescription: initialData.description || '',
         category: initialData.category || '',
-        price: initialData.price || '',
+        price: initialData.price ? Number(initialData.price).toString() : '',
         unit: initialData.unit || '',
-        inStock: initialData.inStock || '',
+        inStock: initialData.in_stock !== undefined ? initialData.in_stock.toString() : '',
         status: initialData.status || 'In Stock',
         supplier: initialData.supplier || ''
       });
-      setImagePreview(initialData.image || null);
+      
+      if (initialData.image_url) {
+        let finalUrl = initialData.image_url;
+        if (finalUrl.startsWith('/uploads')) finalUrl = `http://localhost:8000${finalUrl}`;
+        setImagePreview(finalUrl);
+      }
     }
   }, [mode, initialData]);
+
+  const { showToast } = useAppContext();
+  const [modalState, setModalState] = useState({ isOpen: false, type: '', step: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
+      setSelectedFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result);
-        setFormData({ ...formData, itemImage: reader.result });
       };
       reader.readAsDataURL(file);
     }
@@ -117,6 +128,9 @@ const AddInventoryForm = ({ mode = 'add', initialData = null, onCancel, onUpdate
 
   const handleInputChange = (field, value) => {
     setFormData({ ...formData, [field]: value });
+    if (errors[field]) {
+      setErrors({ ...errors, [field]: '' });
+    }
     if (field === 'inStock') {
       const stock = parseInt(value) || 0;
       let status = 'In Stock';
@@ -126,12 +140,77 @@ const AddInventoryForm = ({ mode = 'add', initialData = null, onCancel, onUpdate
     }
   };
 
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.itemName || formData.itemName.trim() === '') {
+      newErrors.itemName = 'Please enter a valid item name.';
+    }
+    if (!formData.category) {
+      newErrors.category = 'Please select a product category.';
+    }
+    const parsedPrice = parseFloat(formData.price);
+    if (!formData.price || isNaN(parsedPrice) || parsedPrice < 0 || parsedPrice > 100000) {
+      newErrors.price = 'Please enter a valid price between 0 and 100000.';
+    }
+    if (!formData.unit) {
+      newErrors.unit = 'Please select a unit of measurement.';
+    }
+    
+    const parsedStock = parseInt(formData.inStock);
+    if (formData.inStock === '' || isNaN(parsedStock) || parsedStock < 0) {
+      newErrors.inStock = 'Stock quantity must be a whole number greater than or equal to 0.';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
-    if (mode === 'add') {
-      setModalState({ isOpen: true, type: 'submit', step: 'saveConfirm' });
-    } else if (mode === 'edit') {
-      setModalState({ isOpen: true, type: 'success', step: 'updateSuccess' });
+    if (!validateForm()) return;
+    setModalState({ 
+      isOpen: true, 
+      type: mode === 'add' ? 'submit' : 'submit', 
+      step: mode === 'add' ? 'saveConfirm' : 'updateConfirm' 
+    });
+  };
+
+  const executeSave = async () => {
+    try {
+      setIsSubmitting(true);
+      const data = new FormData();
+      data.append('item_name', formData.itemName);
+      data.append('category', formData.category);
+      data.append('price', formData.price);
+      data.append('unit', formData.unit);
+      data.append('in_stock', formData.inStock);
+      data.append('description', formData.itemDescription);
+      data.append('supplier', formData.supplier);
+      
+      if (selectedFile) {
+        data.append('image', selectedFile);
+      }
+
+      let res;
+      if (mode === 'add') {
+        res = await api.post('/inventory', data, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+      } else {
+        res = await api.put(`/inventory/${initialData.id}`, data, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+      }
+
+      if (res.data.success) {
+        showToast(`Item ${mode === 'add' ? 'created' : 'updated'} successfully!`, 'success');
+        setModalState({ isOpen: true, type: 'success', step: mode === 'add' ? 'saveSuccess' : 'updateSuccess' });
+        onUpdate();
+      }
+    } catch (error) {
+      showToast(error.response?.data?.message || 'Failed to save inventory item', 'error');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -142,14 +221,9 @@ const AddInventoryForm = ({ mode = 'add', initialData = null, onCancel, onUpdate
   };
 
   const handleModalPrimaryAction = () => {
-    if (modalState.step === 'saveConfirm') {
-      setModalState({ isOpen: true, type: 'success', step: 'saveSuccess' });
-    } else if (modalState.step === 'saveSuccess') {
+    if (modalState.step === 'saveSuccess' || modalState.step === 'updateSuccess') {
       setModalState({ isOpen: false, type: '', step: '' });
-      console.log('Adding item:', formData);
-    } else if (modalState.step === 'updateSuccess') {
-      setModalState({ isOpen: false, type: '', step: '' });
-      if (onUpdate) onUpdate(formData);
+      onUpdate();
     } else if (modalState.step === 'deleteConfirm') {
       setModalState({ isOpen: false, type: '', step: '' });
       showToast('Deleted successfully', 'success');
@@ -169,7 +243,7 @@ const AddInventoryForm = ({ mode = 'add', initialData = null, onCancel, onUpdate
           </p>
         </div>
 
-        <form className="pt-[16px]" onSubmit={(event) => event.preventDefault()}>
+        <form className="pt-[16px]" onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-[29px] gap-y-[19px]">
             <label>
               <FieldLabel>Item Code</FieldLabel>
@@ -184,6 +258,7 @@ const AddInventoryForm = ({ mode = 'add', initialData = null, onCancel, onUpdate
                 value={formData.itemName}
                 onChange={(e) => handleInputChange('itemName', e.target.value)}
               />
+              {errors.itemName && <p className="mt-[8px] text-[11px] leading-[13px] font-semibold text-[#ff1e27]">{errors.itemName}</p>}
             </label>
 
             <label>
@@ -196,6 +271,7 @@ const AddInventoryForm = ({ mode = 'add', initialData = null, onCancel, onUpdate
                   <div className="flex-1 flex flex-col items-center justify-center relative hover:bg-gray-50 cursor-pointer">
                     <input
                       type="file"
+                      ref={fileInputRef}
                       accept="image/png,image/jpeg,image/webp"
                       onChange={handleImageUpload}
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
@@ -204,15 +280,13 @@ const AddInventoryForm = ({ mode = 'add', initialData = null, onCancel, onUpdate
                       <Icons.Save className="text-[16px]" />
                       <span className="text-[13px] font-semibold">Change Image</span>
                     </div>
-                    <span className="mt-[7px] text-[10px] leading-[12px] font-semibold text-[var(--color-primary)]">
-                      PNG, JPG or WEBP (Max. 2MB)
-                    </span>
                   </div>
                 </div>
               ) : (
                 <div className="relative">
                   <input
                     type="file"
+                    ref={fileInputRef}
                     accept="image/png,image/jpeg,image/webp"
                     onChange={handleImageUpload}
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
@@ -223,9 +297,6 @@ const AddInventoryForm = ({ mode = 'add', initialData = null, onCancel, onUpdate
                   >
                     <Icons.Upload className="text-[28px] text-[var(--color-primary)]" />
                     <span className="mt-[10px] text-[13px] leading-[16px] font-semibold">Click to upload or drag and drop</span>
-                    <span className="mt-[7px] text-[10px] leading-[12px] font-semibold text-[var(--color-primary)]">
-                      PNG, JPG or WEBP (Max. 2MB)
-                    </span>
                   </button>
                 </div>
               )}
@@ -248,6 +319,7 @@ const AddInventoryForm = ({ mode = 'add', initialData = null, onCancel, onUpdate
                 options={['Beverage', 'Steamed Bun', 'Dimsum', 'Deep Fry', 'Bake', 'Noodles', 'Porridge']} 
                 onChange={(e) => handleInputChange('category', e.target.value)}
               />
+              {errors.category && <p className="mt-[8px] text-[11px] leading-[13px] font-semibold text-[#ff1e27]">{errors.category}</p>}
             </label>
 
             <label>
@@ -258,6 +330,7 @@ const AddInventoryForm = ({ mode = 'add', initialData = null, onCancel, onUpdate
                 suffix="0.00"
                 onChange={(e) => handleInputChange('price', e.target.value)}
               />
+              {errors.price && <p className="mt-[8px] text-[11px] leading-[13px] font-semibold text-[#ff1e27]">{errors.price}</p>}
             </label>
 
             <label>
@@ -268,24 +341,24 @@ const AddInventoryForm = ({ mode = 'add', initialData = null, onCancel, onUpdate
                 options={['Cup', 'Plate', 'Piece', 'Bowl', 'Pack']} 
                 onChange={(e) => handleInputChange('unit', e.target.value)}
               />
+              {errors.unit && <p className="mt-[8px] text-[11px] leading-[13px] font-semibold text-[#ff1e27]">{errors.unit}</p>}
             </label>
 
             <label>
-              <FieldLabel required>In Stock</FieldLabel>
+              <FieldLabel required={mode === 'add'}>In Stock</FieldLabel>
               <TextInput 
                 placeholder="Enter stock quantity" 
                 value={formData.inStock}
+                readOnly={mode === 'edit'}
                 suffix="0"
                 onChange={(e) => handleInputChange('inStock', e.target.value)}
               />
+              {errors.inStock && <p className="mt-[8px] text-[11px] leading-[13px] font-semibold text-[#ff1e27]">{errors.inStock}</p>}
             </label>
 
             <label>
               <FieldLabel>Status</FieldLabel>
               <TextInput value={formData.status} readOnly />
-              <p className="mt-[8px] text-[10px] leading-[12px] font-semibold text-[var(--color-primary)]">
-                Status is auto-populated based on In Stock quantity.
-              </p>
             </label>
 
             <label>
@@ -303,14 +376,12 @@ const AddInventoryForm = ({ mode = 'add', initialData = null, onCancel, onUpdate
             <button
               type="button"
               onClick={onCancel}
-              style={{ fontSize: '14px' }}
               className="h-[36px] min-w-[102px] rounded-[7px] border border-[#deddf6] bg-white px-[24px] font-bold text-[var(--color-text)] hover:bg-gray-50"
             >
               Cancel
             </button>
             <button
               type="submit"
-              style={{ fontSize: '14px' }}
               className="h-[36px] min-w-[116px] rounded-[7px] bg-[var(--color-primary)] px-[24px] font-bold text-white flex items-center justify-center gap-[10px] hover:bg-[var(--color-primary-hover)]"
             >
               <Icons.Save className="text-[16px]" />
@@ -320,7 +391,6 @@ const AddInventoryForm = ({ mode = 'add', initialData = null, onCancel, onUpdate
               <button
                 type="button"
                 onClick={handleDelete}
-                style={{ fontSize: '14px' }}
                 className="h-[36px] min-w-[102px] rounded-[7px] border border-[#ff1e27] bg-white px-[24px] font-bold text-[#ff1e27] flex items-center justify-center gap-[8px] hover:bg-[#ffe4e7]"
               >
                 <Icons.Delete className="text-[16px]" />
@@ -337,27 +407,30 @@ const AddInventoryForm = ({ mode = 'add', initialData = null, onCancel, onUpdate
         type={modalState.type}
         title={
           modalState.step === 'saveConfirm' ? 'Add Inventory Item?' :
+          modalState.step === 'updateConfirm' ? 'Update Inventory Item?' :
           modalState.step === 'saveSuccess' ? 'Inventory Item Added!' :
           modalState.step === 'updateSuccess' ? 'Inventory Item Updated!' :
           modalState.step === 'deleteConfirm' ? 'Delete Inventory' : ''
         }
         message={
           modalState.step === 'saveConfirm' ? 'Are you sure you want to add this item to the inventory?' :
+          modalState.step === 'updateConfirm' ? 'Are you sure you want to save these changes to the inventory item?' :
           modalState.step === 'saveSuccess' ? 'The inventory item has been added successfully.' :
           modalState.step === 'updateSuccess' ? 'The inventory item has been updated successfully.' :
           modalState.step === 'deleteConfirm' ? 'Are you sure you want to delete this inventory item? This action cannot be undone.' : ''
         }
         secondaryAction={
-          ['saveConfirm', 'deleteConfirm'].includes(modalState.step) 
+          ['saveConfirm', 'updateConfirm', 'deleteConfirm'].includes(modalState.step) 
             ? { text: 'Cancel', onClick: () => setModalState({ isOpen: false, type: '', step: '' }) } 
             : null
         }
         primaryAction={{
           text: modalState.step === 'saveConfirm' ? 'Yes, Save' :
+                modalState.step === 'updateConfirm' ? 'Yes, Update' :
                 modalState.step === 'saveSuccess' ? 'View Inventory' :
                 modalState.step === 'updateSuccess' ? 'View Inventory' :
                 modalState.step === 'deleteConfirm' ? 'Delete' : '',
-          onClick: handleModalPrimaryAction
+          onClick: ['saveConfirm', 'updateConfirm'].includes(modalState.step) ? executeSave : handleModalPrimaryAction
         }}
       />
     </section>

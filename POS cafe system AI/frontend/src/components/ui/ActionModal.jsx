@@ -32,6 +32,11 @@ const ActionModal = ({
       icon: <Icons.Delete className="text-[#ff1e27] text-[24px]" />,
       bgClass: 'bg-[#ffe4e7]',
       primaryColor: 'bg-[#ff1e27] hover:bg-[#d6171f]',
+    },
+    warning: {
+      icon: <Icons.Warning className="text-[#f58025] text-[24px]" />,
+      bgClass: 'bg-[#fdf0e6]',
+      primaryColor: 'bg-[#f58025] hover:bg-[#de711d]',
     }
   };
 
@@ -70,6 +75,7 @@ const ActionModal = ({
             >
               {type === 'delete' || type === 'cancel' ? <Icons.Delete className="text-[14px]" /> : null}
               {type === 'success' && !secondaryAction ? <Icons.Check className="text-[16px]" /> : null}
+              {type === 'warning' ? <Icons.ArrowRight className="text-[16px]" /> : null}
               {primaryAction.text}
             </button>
           )}

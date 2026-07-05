@@ -18,17 +18,25 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Interceptor to handle 401 Unauthorized (e.g., token expired)
+// Interceptor to handle 401 Unauthorized and 403 Forbidden
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Basic implementation: if 401, you could try to refresh token here
-    // or log the user out by clearing local storage and redirecting to login.
-    if (error.response && error.response.status === 401) {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-      localStorage.removeItem('user');
-      // window.location.href = '/login'; // Optional: force redirect
+    if (error.response) {
+      if (error.response.status === 401) {
+        // Skip triggering the global unauthorized modal for the login endpoint
+        if (error.config.url && error.config.url.includes('/auth/login')) {
+          return Promise.reject(error);
+        }
+
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('user');
+        localStorage.removeItem('permissions');
+        window.dispatchEvent(new CustomEvent('unauthorized', { detail: { type: 'login_required' } }));
+      } else if (error.response.status === 403) {
+        window.dispatchEvent(new CustomEvent('unauthorized', { detail: { type: 'forbidden' } }));
+      }
     }
     return Promise.reject(error);
   }

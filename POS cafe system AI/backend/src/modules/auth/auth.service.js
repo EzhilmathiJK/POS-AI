@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import * as authRepo from './auth.repository.js';
 import { generateAccessToken, generateRefreshToken } from '../../utils/jwt.util.js';
-import { ROLES } from './auth.constants.js';
+import { ROLES, DEFAULT_ROLE_PERMISSIONS } from './auth.constants.js';
 
 export const registerUser = async (userData) => {
   const { full_name, username, email, password } = userData;
@@ -56,7 +56,10 @@ export const loginUser = async (username, password) => {
   }
 
   // 3. Get Role Permissions
-  const permissions = await authRepo.findPermissionsByRole(user.role);
+  let permissions = await authRepo.findPermissionsByRole(user.role);
+  if (!permissions) {
+    permissions = { role: user.role, ...DEFAULT_ROLE_PERMISSIONS[user.role] };
+  }
 
   // 4. Generate Tokens
   const jwtPayload = {
