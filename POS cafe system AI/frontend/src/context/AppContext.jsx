@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { toast as toastify } from 'react-toastify';
 import { Icons } from '../assets/icons';
 
@@ -59,6 +59,53 @@ export const AppProvider = ({ children }) => {
   // Unauthorized Modal State
   const [unauthorizedState, setUnauthorizedState] = useState({ isOpen: false, type: null });
   const triggerUnauthorized = useCallback((type) => setUnauthorizedState({ isOpen: true, type }), []);
+
+  // Auto-trigger Unauthorized when token expires
+  useEffect(() => {
+    let timeoutId;
+    
+    const checkTokenExpiration = () => {
+      const token = localStorage.getItem('accessToken');
+      if (!token) return;
+
+      try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+
+        const decoded = JSON.parse(jsonPayload);
+        const exp = decoded.exp * 1000;
+        const now = Date.now();
+        // Trigger a ping 1 second AFTER expiration to force the interceptor's 401 seamless refresh logic
+        const timeUntilExpiry = (exp - now) + 1000;
+        
+        if (timeUntilExpiry <= 0) {
+          import('../api/axios').then(({ default: api }) => api.get('/auth/me').catch(() => {}));
+        } else {
+          timeoutId = setTimeout(() => {
+            import('../api/axios').then(({ default: api }) => api.get('/auth/me').catch(() => {}));
+          }, timeUntilExpiry);
+        }
+      } catch (error) {
+        console.error("Error parsing token", error);
+      }
+    };
+
+    checkTokenExpiration();
+
+    const handleTokenRefreshed = () => {
+      clearTimeout(timeoutId);
+      checkTokenExpiration();
+    };
+    window.addEventListener('token_refreshed', handleTokenRefreshed);
+
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener('token_refreshed', handleTokenRefreshed);
+    };
+  }, [currentUser, triggerUnauthorized]);
 
   return (
     <AppContext.Provider value={{

@@ -34,12 +34,14 @@ import usersRoutes from './modules/users/users.routes.js';
 import settingsRoutes from './modules/settings/settings.routes.js';
 import inventoryRoutes from './modules/inventory/inventory.routes.js';
 import billingRoutes from './modules/billing/billing.routes.js';
+import itemRequestRoutes from './modules/item-request/item-request.routes.js';
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/billing', billingRoutes);
+app.use('/api/item-requests', itemRequestRoutes);
 
 // 5. 404 Handler for undefined routes
 app.use((req, res, next) => {

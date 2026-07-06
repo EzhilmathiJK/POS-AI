@@ -129,7 +129,7 @@ const InventoryTable = ({ items = [], loading, onAddItem, onEditItem }) => {
                   </div>
                 </td>
                 <td className="px-[18px] font-normal text-[var(--color-primary)] whitespace-nowrap">{item.category}</td>
-                <td className="px-[18px] font-normal whitespace-nowrap">${Number(item.price).toFixed(2)}</td>
+                <td className="px-[18px] font-normal whitespace-nowrap">₹{Number(item.price).toFixed(2)}</td>
                 <td className="px-[18px] font-normal text-[var(--color-primary)] whitespace-nowrap">{item.unit}</td>
                 <td className="px-[18px] font-normal whitespace-nowrap text-center">{item.purchased}</td>
                 <td className="px-[18px] font-normal whitespace-nowrap text-center">{item.sold}</td>

@@ -2,17 +2,7 @@ import { useState, useEffect } from 'react';
 import { Icons } from '../../../assets/icons';
 import ActionModal from '../../../components/ui/ActionModal';
 import { useAppContext } from '../../../context/AppContext';
-
-const itemOptions = [
-  'Black Coffee',
-  'Black Tea',
-  'Bubble Tea',
-  'Cold Coffee',
-  'Ginger Tea',
-  'Iced Tea',
-  'Milk',
-  'Milo',
-];
+import api from '../../../api/axios';
 
 const requiredMark = <span className="text-[#ff1e27]">*</span>;
 
@@ -57,7 +47,7 @@ const DateInput = ({ value, readOnly = false, onChange }) => (
   </div>
 );
 
-const SelectInput = ({ value, onChange }) => (
+const SelectInput = ({ value, onChange, options = [] }) => (
   <div className="relative">
     <select
       required
@@ -67,8 +57,8 @@ const SelectInput = ({ value, onChange }) => (
       className="w-full h-[32px] appearance-none rounded-[6px] border border-[#deddf6] bg-white pl-[12px] pr-[34px] text-[var(--color-primary)] invalid:text-[#9b8fd6] outline-none focus:border-[var(--color-primary)] cursor-pointer"
     >
       <option value="" disabled hidden>Select item</option>
-      {itemOptions.map((item) => (
-        <option key={item} value={item}>{item}</option>
+      {options.map((item) => (
+        <option key={item.id} value={item.id}>{item.item_name}</option>
       ))}
     </select>
     <Icons.ChevronDown className="absolute right-[12px] top-[10px] text-[12px] text-[#b2b5c2] pointer-events-none" />
@@ -95,32 +85,46 @@ const NewItemRequestForm = ({ mode = 'add', initialData = null, onCancel, onUpda
     status: 'Pending'
   });
   const [rows, setRows] = useState([{ id: 1, item: '', quantity: '', expectedDate: '' }]);
-  const { showToast } = useAppContext();
+  const [inventoryItems, setInventoryItems] = useState([]);
+  const { showToast, currentUser } = useAppContext();
   const [modalState, setModalState] = useState({ isOpen: false, type: '', step: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
+    const fetchInventory = async () => {
+      try {
+        const res = await api.get('/inventory?limit=1000');
+        if (res.data.success) {
+          setInventoryItems(res.data.data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch inventory', err);
+      }
+    };
+    fetchInventory();
+
     if (mode === 'edit' && initialData) {
       setFormData({
         requestId: initialData.id || '',
         subject: initialData.subject || '',
-        requestedBy: initialData.requestedBy || 'Admin',
-        requestedDate: formatDateForInput(initialData.requestedDate),
-        expectingDelivery: formatDateForInput(initialData.expectedDelivery),
+        requestedBy: initialData.requested_by || 'Admin',
+        requestedDate: formatDateForInput(initialData.created_at || initialData.request_date),
+        expectingDelivery: formatDateForInput(initialData.delivery_date),
         status: initialData.status || 'Pending'
       });
-      if (initialData.items && initialData.items.length > 0) {
-        setRows(initialData.items.map((item, index) => ({
+      if (initialData.details && initialData.details.length > 0) {
+        setRows(initialData.details.map((detail, index) => ({
           id: index + 1,
-          item: item.name || '',
-          quantity: item.quantity || '',
-          expectedDate: formatDateForInput(item.expectedDate)
+          item: detail.inventory_id || '',
+          quantity: detail.quantity || '',
+          expectedDate: formatDateForInput(detail.expected_date)
         })));
       }
     } else {
       const today = new Date().toLocaleDateString('en-CA');
-      setFormData(prev => ({ ...prev, requestedDate: today }));
+      setFormData(prev => ({ ...prev, requestedDate: today, requestedBy: currentUser?.full_name || 'Admin' }));
     }
-  }, [mode, initialData]);
+  }, [mode, initialData, currentUser]);
 
   const handleInputChange = (field, value) => {
     setFormData({ ...formData, [field]: value });
@@ -140,15 +144,53 @@ const NewItemRequestForm = ({ mode = 'add', initialData = null, onCancel, onUpda
     ));
   };
 
-  const handleSave = () => {
-    if (mode === 'add') {
-      setModalState({ isOpen: true, type: 'success', step: 'saveSuccess' });
-    } else {
-      setModalState({ isOpen: true, type: 'success', step: 'updateSuccess' });
+  const validateForm = () => {
+    if (!formData.subject.trim()) {
+      showToast('Subject is required', 'error');
+      return false;
+    }
+    if (rows.length === 0 || rows.some(r => !r.item || !r.quantity || !r.expectedDate)) {
+      showToast('All item fields are required', 'error');
+      return false;
+    }
+    return true;
+  };
+
+  const getPayload = () => ({
+    subject: formData.subject,
+    requestedBy: currentUser?.full_name || 'Admin',
+    deliveryDate: formData.expectingDelivery,
+    items: rows.map(r => ({
+      inventoryId: parseInt(r.item),
+      quantity: parseInt(r.quantity),
+      expectedDate: r.expectedDate
+    }))
+  });
+
+  const handleSave = async () => {
+    if (!validateForm()) return;
+    try {
+      setIsSubmitting(true);
+      if (mode === 'add') {
+        const res = await api.post('/item-requests', getPayload());
+        if (res.data.success) {
+          setModalState({ isOpen: true, type: 'success', step: 'saveSuccess' });
+        }
+      } else {
+        const res = await api.put(`/item-requests/${formData.requestId}`, getPayload());
+        if (res.data.success) {
+          setModalState({ isOpen: true, type: 'success', step: 'updateSuccess' });
+        }
+      }
+    } catch (error) {
+      showToast(error.response?.data?.message || 'An error occurred', 'error');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleSubmitRequest = () => {
+    if (!validateForm()) return;
     setModalState({ isOpen: true, type: 'submit', step: 'submitConfirm' });
   };
 
@@ -156,20 +198,40 @@ const NewItemRequestForm = ({ mode = 'add', initialData = null, onCancel, onUpda
     setModalState({ isOpen: true, type: 'cancel', step: 'cancelConfirm' });
   };
 
-  const handleModalPrimaryAction = () => {
-    if (modalState.step === 'saveSuccess') {
+  const handleModalPrimaryAction = async () => {
+    try {
+      setIsSubmitting(true);
+      const step = modalState.step;
       setModalState({ isOpen: false, type: '', step: '' });
-      console.log('Save:', { ...formData, items: rows });
-    } else if (modalState.step === 'updateSuccess') {
-      setModalState({ isOpen: false, type: '', step: '' });
-      if (onUpdate) onUpdate({ ...formData, items: rows });
-    } else if (modalState.step === 'submitConfirm') {
-      setModalState({ isOpen: false, type: '', step: '' });
-      console.log('Submit:', { ...formData, items: rows });
-    } else if (modalState.step === 'cancelConfirm') {
-      setModalState({ isOpen: false, type: '', step: '' });
-      showToast('Request cancelled successfully', 'success');
-      if (onDelete) onDelete();
+
+      if (step === 'saveSuccess' || step === 'updateSuccess') {
+        if (onUpdate) onUpdate();
+      } else if (step === 'submitConfirm') {
+        // If mode is add, we first create it, then submit it
+        let reqId = formData.requestId;
+        if (mode === 'add') {
+          const res = await api.post('/item-requests', getPayload());
+          reqId = res.data.data.id;
+        } else {
+          await api.put(`/item-requests/${reqId}`, getPayload());
+        }
+        
+        const res = await api.patch(`/item-requests/${reqId}/submit`);
+        if (res.data.success) {
+          showToast('Request submitted successfully', 'success');
+          if (onUpdate) onUpdate();
+        }
+      } else if (step === 'cancelConfirm') {
+        const res = await api.patch(`/item-requests/${formData.requestId}/cancel`);
+        if (res.data.success) {
+          showToast('Request cancelled successfully', 'success');
+          if (onUpdate) onUpdate();
+        }
+      }
+    } catch (error) {
+      showToast(error.response?.data?.message || 'An error occurred', 'error');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -248,6 +310,7 @@ const NewItemRequestForm = ({ mode = 'add', initialData = null, onCancel, onUpda
               <div className="px-[15px]">
                 <SelectInput 
                   value={row.item}
+                  options={inventoryItems}
                   onChange={(e) => handleRowChange(row.id, 'item', e.target.value)}
                 />
               </div>
@@ -301,8 +364,9 @@ const NewItemRequestForm = ({ mode = 'add', initialData = null, onCancel, onUpda
           <button
             type="button"
             onClick={handleSave}
+            disabled={isSubmitting}
             style={{ fontSize: '14px' }}
-            className="h-[36px] min-w-[113px] rounded-[7px] bg-[var(--color-primary)] px-[24px] font-bold text-white flex items-center justify-center gap-[10px] hover:bg-[var(--color-primary-hover)]"
+            className="h-[36px] min-w-[113px] rounded-[7px] bg-[var(--color-primary)] px-[24px] font-bold text-white flex items-center justify-center gap-[10px] hover:bg-[var(--color-primary-hover)] disabled:opacity-50"
           >
             <Icons.Save className="text-[16px]" />
             {mode === 'add' ? 'Save' : 'Update'}
@@ -310,8 +374,9 @@ const NewItemRequestForm = ({ mode = 'add', initialData = null, onCancel, onUpda
           <button
             type="button"
             onClick={handleSubmitRequest}
+            disabled={isSubmitting}
             style={{ fontSize: '14px' }}
-            className="h-[36px] min-w-[180px] rounded-[7px] bg-[#078c22] px-[24px] font-bold text-white flex items-center justify-center gap-[10px] hover:bg-[#05791d]"
+            className="h-[36px] min-w-[180px] rounded-[7px] bg-[#078c22] px-[24px] font-bold text-white flex items-center justify-center gap-[10px] hover:bg-[#05791d] disabled:opacity-50"
           >
             <Icons.Send className="text-[17px]" />
             Submit Request

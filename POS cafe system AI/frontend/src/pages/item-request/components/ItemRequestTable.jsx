@@ -1,5 +1,4 @@
 import { Icons } from '../../../assets/icons';
-import { itemRequests } from '../itemRequestData';
 
 const columns = [
   'Request ID',
@@ -40,7 +39,11 @@ const EntriesSelect = () => (
   </div>
 );
 
-const ItemRequestTable = ({ onNewItemRequest, onEditRequest }) => {
+const ItemRequestTable = ({ requests, loading, pagination, onPageChange, onNewItemRequest, onEditRequest }) => {
+  const { page, totalPages, totalRecords, limit } = pagination || { page: 1, totalPages: 1, totalRecords: 0, limit: 10 };
+  const startRecord = (page - 1) * limit + 1;
+  const endRecord = Math.min(page * limit, totalRecords);
+
   return (
     <section className="w-full flex-1 min-h-[520px] lg:min-h-0 flex flex-col bg-white rounded-[6px] border border-[var(--color-border)] shadow-[0_1px_2px_rgba(3,4,90,0.04)] mt-[12px] overflow-hidden min-w-0 shrink-0">
       
@@ -48,7 +51,7 @@ const ItemRequestTable = ({ onNewItemRequest, onEditRequest }) => {
       <div className="w-full px-[14px] pt-[16px] pb-[10px] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-[14px] shrink-0">
         <div className="flex flex-row items-center justify-between sm:flex-col sm:items-start gap-[2px]">
           <h2 className="text-[13px] leading-[19px] font-semibold text-[var(--color-text)]">Item Request List</h2>
-          <span className="text-[12px] leading-[18px] font-normal text-[var(--color-primary)]">Total 10 requests</span>
+          <span className="text-[12px] leading-[18px] font-normal text-[var(--color-primary)]">Total {totalRecords} requests</span>
         </div>
 
         <div className="grid grid-cols-2 gap-[8px] sm:flex sm:items-center sm:gap-[10px] w-full sm:w-auto">
@@ -85,35 +88,54 @@ const ItemRequestTable = ({ onNewItemRequest, onEditRequest }) => {
             </tr>
           </thead>
           <tbody>
-            {itemRequests.map((request) => (
-              <tr key={request.id} className="h-[64px] border-b border-[#deddf6] last:border-b-0 hover:bg-gray-50 transition-colors">
-                <td className="px-[14px] font-normal whitespace-nowrap">
-                  <button 
-                    onClick={() => onEditRequest(request)}
-                    className="text-[var(--color-primary)] hover:underline cursor-pointer text-left"
-                  >
-                    {request.id}
-                  </button>
-                </td>
-                <td className="px-[14px] font-normal whitespace-nowrap">{request.subject}</td>
-                <td className="px-[14px] font-normal whitespace-nowrap">{request.requestedBy}</td>
-                <td className="px-[14px] font-normal whitespace-nowrap">
-                  <div>{request.requestedDate}</div>
-                  <div className="mt-[3px]">{request.requestedTime}</div>
-                </td>
-                <td className="px-[14px] font-normal whitespace-nowrap">{request.expectedDelivery}</td>
-                <td className="px-[14px] font-normal whitespace-nowrap">
-                  <span className={`inline-flex items-center justify-center h-[22px] rounded-[5px] px-[10px] text-[11px] font-semibold ${statusClasses[request.status]}`}>
-                    {request.status}
-                  </span>
-                </td>
-                <td className="px-[14px] font-normal whitespace-nowrap">
-                  <button className="w-[28px] h-[28px] rounded-[6px] text-[var(--color-primary)] hover:bg-[var(--color-primary-soft)] flex items-center justify-center cursor-pointer" aria-label={`View ${request.id}`}>
-                    <Icons.Eye className="text-[14px]" />
-                  </button>
-                </td>
-              </tr>
-            ))}
+            {loading ? (
+              <tr><td colSpan={7} className="text-center py-4 text-gray-500">Loading requests...</td></tr>
+            ) : requests && requests.length > 0 ? (
+              requests.map((request) => {
+                let earliestDelivery = null;
+                if (request.details && request.details.length > 0) {
+                  const dates = request.details.map(d => new Date(d.expected_date)).sort((a,b) => a-b);
+                  const d = dates[0];
+                  earliestDelivery = `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}-${d.getFullYear()}`;
+                }
+                
+                const created = new Date(request.created_at || request.request_date);
+                const reqDate = `${String(created.getDate()).padStart(2, '0')}-${String(created.getMonth() + 1).padStart(2, '0')}-${created.getFullYear()}`;
+                const reqTime = created.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+
+                return (
+                  <tr key={request.id} className="h-[64px] border-b border-[#deddf6] last:border-b-0 hover:bg-gray-50 transition-colors">
+                    <td className="px-[14px] font-normal whitespace-nowrap">
+                      <button 
+                        onClick={() => onEditRequest(request)}
+                        className="text-[var(--color-primary)] hover:underline cursor-pointer text-left"
+                      >
+                        {request.request_number}
+                      </button>
+                    </td>
+                    <td className="px-[14px] font-normal whitespace-nowrap">{request.subject}</td>
+                    <td className="px-[14px] font-normal whitespace-nowrap">{request.requested_by}</td>
+                    <td className="px-[14px] font-normal whitespace-nowrap">
+                      <div>{reqDate}</div>
+                      <div className="mt-[3px] text-[11px]">{reqTime}</div>
+                    </td>
+                    <td className="px-[14px] font-normal whitespace-nowrap">{earliestDelivery || '-'}</td>
+                    <td className="px-[14px] font-normal whitespace-nowrap">
+                      <span className={`inline-flex items-center justify-center h-[22px] rounded-[5px] px-[10px] text-[11px] font-semibold ${statusClasses[request.status]}`}>
+                        {request.status}
+                      </span>
+                    </td>
+                    <td className="px-[14px] font-normal whitespace-nowrap">
+                      <button onClick={() => onEditRequest(request)} className="w-[28px] h-[28px] rounded-[6px] text-[var(--color-primary)] hover:bg-[var(--color-primary-soft)] flex items-center justify-center cursor-pointer" aria-label={`View ${request.request_number}`}>
+                        <Icons.Eye className="text-[14px]" />
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })
+            ) : (
+              <tr><td colSpan={7} className="text-center py-4 text-gray-500">No requests found.</td></tr>
+            )}
           </tbody>
         </table>
       </div>
@@ -127,26 +149,28 @@ const ItemRequestTable = ({ onNewItemRequest, onEditRequest }) => {
             <EntriesSelect />
             <span>entries</span>
           </div>
-          <p className="font-semibold text-[12px] md:hidden">Showing 1 to 10 of 10 requests</p>
+          {totalRecords > 0 && <p className="font-semibold text-[12px] md:hidden">Showing {startRecord} to {endRecord} of {totalRecords} requests</p>}
         </div>
 
-        <div className="flex items-center justify-center gap-[5px] w-full md:w-auto">
-          <button className="w-[28px] h-[28px] rounded-[7px] border border-[var(--color-border)] text-[#b9bdcb] flex items-center justify-center">
-            <Icons.First className="text-[14px]" />
-          </button>
-          <button className="w-[28px] h-[28px] rounded-[7px] border border-[var(--color-border)] text-[#b9bdcb] flex items-center justify-center">
-            <Icons.Prev className="text-[14px]" />
-          </button>
-          <button className="w-[30px] h-[30px] rounded-[7px] bg-[var(--color-primary)] text-white font-semibold">1</button>
-          <button className="w-[28px] h-[28px] rounded-[7px] border border-[var(--color-border)] text-[#b9bdcb] flex items-center justify-center">
-            <Icons.Next className="text-[14px]" />
-          </button>
-          <button className="w-[28px] h-[28px] rounded-[7px] border border-[var(--color-border)] text-[#b9bdcb] flex items-center justify-center">
-            <Icons.Last className="text-[14px]" />
-          </button>
-        </div>
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-[5px] w-full md:w-auto">
+            <button disabled={page === 1} onClick={() => onPageChange(1)} className="w-[28px] h-[28px] rounded-[7px] border border-[var(--color-border)] text-[#b9bdcb] flex items-center justify-center hover:bg-gray-50 disabled:opacity-50">
+              <Icons.First className="text-[14px]" />
+            </button>
+            <button disabled={page === 1} onClick={() => onPageChange(page - 1)} className="w-[28px] h-[28px] rounded-[7px] border border-[var(--color-border)] text-[#b9bdcb] flex items-center justify-center hover:bg-gray-50 disabled:opacity-50">
+              <Icons.Prev className="text-[14px]" />
+            </button>
+            <button className="w-[30px] h-[30px] rounded-[7px] bg-[var(--color-primary)] text-white font-semibold">{page}</button>
+            <button disabled={page === totalPages} onClick={() => onPageChange(page + 1)} className="w-[28px] h-[28px] rounded-[7px] border border-[var(--color-border)] text-[#b9bdcb] flex items-center justify-center hover:bg-gray-50 disabled:opacity-50">
+              <Icons.Next className="text-[14px]" />
+            </button>
+            <button disabled={page === totalPages} onClick={() => onPageChange(totalPages)} className="w-[28px] h-[28px] rounded-[7px] border border-[var(--color-border)] text-[#b9bdcb] flex items-center justify-center hover:bg-gray-50 disabled:opacity-50">
+              <Icons.Last className="text-[14px]" />
+            </button>
+          </div>
+        )}
 
-        <p className="text-right font-semibold text-[12px] hidden md:block">Showing 1 to 10 of 10 requests</p>
+        {totalRecords > 0 && <p className="text-right font-semibold text-[12px] hidden md:block">Showing {startRecord} to {endRecord} of {totalRecords} requests</p>}
       </div>
     </section>
   );

@@ -1,13 +1,60 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import ItemRequestTopBar from './components/ItemRequestTopBar';
 import ItemRequestFilters from './components/ItemRequestFilters';
 import ItemRequestTable from './components/ItemRequestTable';
 import NewItemRequestForm from './components/NewItemRequestForm';
+import api from '../../api/axios';
+import { useAppContext } from '../../context/AppContext';
 
 const ItemRequestLayout = () => {
   const [isAddingRequest, setIsAddingRequest] = useState(false);
   const [isEditingRequest, setIsEditingRequest] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
+
+  const [itemRequests, setItemRequests] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [pagination, setPagination] = useState({ page: 1, limit: 10, totalPages: 1, totalRecords: 0 });
+  const [filters, setFilters] = useState({});
+  const { showToast } = useAppContext();
+
+  const fetchItemRequests = useCallback(async (currentFilters = filters, page = pagination.page) => {
+    try {
+      setLoading(true);
+      const queryParams = new URLSearchParams({
+        page,
+        limit: pagination.limit,
+        ...currentFilters
+      });
+
+      const res = await api.get(`/item-requests?${queryParams}`);
+      if (res.data.success) {
+        setItemRequests(res.data.data.itemRequests);
+        setPagination(prev => ({
+          ...prev,
+          page: res.data.data.currentPage,
+          totalPages: res.data.data.totalPages,
+          totalRecords: res.data.data.totalRecords
+        }));
+      }
+    } catch (error) {
+      showToast('Failed to fetch item requests', 'error');
+    } finally {
+      setLoading(false);
+    }
+  }, [filters, pagination.page, pagination.limit, showToast]);
+
+  useEffect(() => {
+    fetchItemRequests();
+  }, [fetchItemRequests]);
+
+  const handleFilter = (newFilters) => {
+    setFilters(newFilters);
+    fetchItemRequests(newFilters, 1);
+  };
+
+  const handlePageChange = (newPage) => {
+    fetchItemRequests(filters, newPage);
+  };
 
   const handleEditRequest = (request) => {
     setSelectedRequest(request);
@@ -20,13 +67,13 @@ const ItemRequestLayout = () => {
     setSelectedRequest(null);
   };
 
-  const handleUpdate = (updatedData) => {
-    console.log('Updating request:', updatedData);
+  const handleUpdate = () => {
+    fetchItemRequests();
     handleCancel();
   };
 
   const handleDelete = () => {
-    console.log('Deleting request:', selectedRequest);
+    // Delete is currently not a feature on backend, cancel is used.
     handleCancel();
   };
 
@@ -48,8 +95,15 @@ const ItemRequestLayout = () => {
         />
       ) : (
         <>
-          <ItemRequestFilters />
-          <ItemRequestTable onNewItemRequest={() => setIsAddingRequest(true)} onEditRequest={handleEditRequest} />
+          <ItemRequestFilters onFilter={handleFilter} />
+          <ItemRequestTable 
+            requests={itemRequests} 
+            loading={loading}
+            pagination={pagination}
+            onPageChange={handlePageChange}
+            onNewItemRequest={() => setIsAddingRequest(true)} 
+            onEditRequest={handleEditRequest} 
+          />
         </>
       )}
     </div>

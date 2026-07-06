@@ -59,9 +59,10 @@ model Inventory {
   status      String   @default("Out of Stock")
   supplier    String?
   is_deleted  Boolean  @default(false)
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
-  bill_items  BillItem[]
+  created_at           DateTime            @default(now())
+  updated_at           DateTime            @updatedAt
+  bill_items           BillItem[]
+  item_request_details ItemRequestDetail[]
 
   @@map("inventory")
 }
@@ -97,3 +98,35 @@ model BillItem {
 
   @@map("bill_items")
 }
+
+model ItemRequestHeader {
+  id                Int                 @id @default(autoincrement())
+  request_number    String              @unique
+  subject           String
+  requested_by      String
+  request_date      DateTime            @default(now())
+  delivery_date     DateTime            @db.Date
+  status            String              @default("Pending")
+  inventory_updated Boolean             @default(false)
+  
+  details           ItemRequestDetail[]
+
+  created_at        DateTime            @default(now())
+  updated_at        DateTime            @updatedAt
+
+  @@map("item_request_header")
+}
+
+model ItemRequestDetail {
+  id                 Int               @id @default(autoincrement())
+  item_request_id    Int
+  inventory_id       Int
+  quantity           Int
+  expected_date      DateTime          @db.Date
+
+  item_request       ItemRequestHeader @relation(fields: [item_request_id], references: [id], onDelete: Cascade)
+  inventory          Inventory         @relation(fields: [inventory_id], references: [id])
+
+  @@map("item_request_details")
+}
+
