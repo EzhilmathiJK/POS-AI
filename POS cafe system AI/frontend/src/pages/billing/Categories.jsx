@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { Icons } from '../../assets/icons';
 import { useAppContext } from '../../context/AppContext';
 
-const Categories = ({ activeCategory, onSelectCategory, isMobile = false }) => {
-  const { categories } = useAppContext();
-
+const Categories = ({ categories: propCategories, activeCategory, onSelectCategory, isMobile = false }) => {
+  const { categories: contextCategories } = useAppContext();
+  
   const displayCategories = [
-    ...categories,
+    ...(propCategories || contextCategories),
     { id: 'all-items', name: 'All Items', iconName: 'AllItems' }
   ];
 

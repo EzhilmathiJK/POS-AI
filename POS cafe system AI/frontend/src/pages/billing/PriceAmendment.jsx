@@ -1,7 +1,9 @@
 import { Icons } from '../../assets/icons';
 
-const PriceAmendment = ({ totalAmount, gstAmount, payable }) => {
+const PriceAmendment = ({ totalAmount, gstAmount, payable, tenderAmount = 0, onTenderChange }) => {
   const formatAmount = (amount) => `₹${amount.toFixed(2)}`;
+
+  const change = tenderAmount > payable ? tenderAmount - payable : 0;
 
   return (
     <div className="bg-white rounded-[7px] flex-1 flex flex-col min-h-0">
@@ -35,6 +37,11 @@ const PriceAmendment = ({ totalAmount, gstAmount, payable }) => {
             <span className="absolute left-[13px] top-1/2 -translate-y-1/2 text-[12px] font-semibold text-[var(--color-primary)]">₹</span>
             <input
               type="text"
+              value={tenderAmount > 0 ? tenderAmount.toFixed(2) : ''}
+              onChange={(e) => {
+                const val = parseFloat(e.target.value);
+                if (onTenderChange) onTenderChange(isNaN(val) ? 0 : val);
+              }}
               placeholder="0.00"
               className="w-full h-[37px] bg-[#fbfbfd] border border-[#deddf6] rounded-[5px] pl-[29px] pr-[18px] text-right text-[14px] font-semibold text-[var(--color-primary)] placeholder:text-[#c8c3e7] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
             />
@@ -44,7 +51,7 @@ const PriceAmendment = ({ totalAmount, gstAmount, payable }) => {
         <div className="mt-auto px-[16px] pt-[16px] shrink-0">
           <div className="h-[53px] rounded-[6px] bg-[#f1effc] px-[14px] flex items-center justify-between">
             <span className="text-[13px] leading-[16px] font-bold text-[var(--color-text)]">Change (Balance)</span>
-            <span className="text-[20px] leading-[24px] font-bold text-[var(--color-primary)]">₹0.00</span>
+            <span className="text-[20px] leading-[24px] font-bold text-[var(--color-primary)]">{formatAmount(change)}</span>
           </div>
         </div>
       </div>

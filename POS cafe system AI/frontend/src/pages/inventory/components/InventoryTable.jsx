@@ -34,7 +34,9 @@ const SortMark = () => (
 
 
 
-const InventoryTable = ({ items = [], loading, onAddItem, onEditItem }) => {
+const InventoryTable = ({ items = [], loading, pagination, onPageChange, onLimitChange, onAddItem, onEditItem }) => {
+  const totalRecords = pagination?.totalRecords || 0;
+
   return (
     <div className="w-full flex-1 min-h-[520px] lg:min-h-0 flex flex-col bg-white rounded-[6px] border border-[var(--color-border)] overflow-hidden min-w-0 shrink-0 relative">
 
@@ -42,7 +44,7 @@ const InventoryTable = ({ items = [], loading, onAddItem, onEditItem }) => {
       <div className="w-full px-[17px] pt-[16px] pb-[10px] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-[14px] shrink-0">
         <div className="flex flex-row items-center justify-between sm:flex-col sm:items-start gap-[2px]">
           <h2 className="text-[13px] leading-[19px] font-semibold text-[var(--color-text)]">Inventory List</h2>
-          <span className="text-[12px] leading-[18px] font-normal text-[var(--color-primary)]">Total {items.length} items found</span>
+          <span className="text-[12px] leading-[18px] font-normal text-[var(--color-primary)]">Total {totalRecords} items</span>
         </div>
 
         <div className="grid grid-cols-3 gap-[8px] sm:flex sm:items-center sm:gap-[10px] w-full sm:w-auto">
@@ -136,8 +138,10 @@ const InventoryTable = ({ items = [], loading, onAddItem, onEditItem }) => {
       </div>
 
       <Pagination 
-        pagination={{ page: 1, totalPages: 1, totalRecords: items.length, limit: 10 }}
-        itemName="entries"
+        pagination={pagination}
+        onPageChange={onPageChange}
+        onLimitChange={onLimitChange}
+        itemName="items"
       />
     </div>
   );

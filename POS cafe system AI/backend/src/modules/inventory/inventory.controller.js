@@ -66,3 +66,12 @@ export const deleteInventoryItem = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getInventoryFilters = async (req, res, next) => {
+  try {
+    const result = await inventoryService.getInventoryFilters();
+    res.status(200).json({ success: true, message: 'Inventory filters fetched successfully.', data: result });
+  } catch (error) {
+    next(error);
+  }
+};

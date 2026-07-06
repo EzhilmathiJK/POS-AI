@@ -1,23 +1,18 @@
 import React, { useState, useMemo } from 'react';
 
-export const menuItems = [
-  { id: 1, name: 'Black Coffee', price: 15.00, image: '/menu/black-coffee.png', category: 'Beverage' },
-  { id: 2, name: 'Black Tea', price: 20.00, image: '/menu/black-tea.png', category: 'Beverage' },
-  { id: 3, name: 'Bubble Tea', price: 80.00, image: '/menu/bubble-tea.png', category: 'Beverage' },
-  { id: 4, name: 'Ginger Tea', price: 24.00, image: '/menu/ginger-tea.png', category: 'Beverage' },
-  { id: 5, name: 'Cold Coffee', price: 20.00, image: '/menu/cold-coffee.png', category: 'Beverage' },
-  { id: 6, name: 'Iced Tea', price: 50.00, image: '/menu/iced-tea.png', category: 'Beverage' },
-  { id: 7, name: 'Milk', price: 20.00, image: '/menu/milk.png', category: 'Beverage' },
-  { id: 8, name: 'Milo', price: 60.00, image: '/menu/milo.png', category: 'Beverage' },
-  { id: 9, name: 'Cream Bun', price: 80.00, image: '/menu/cream-bun.png', category: 'Steamed Bun' },
-  { id: 10, name: 'BBQ Bun', price: 50.00, image: '/menu/bbq-bun.png', category: 'Steamed Bun' },
-];
+
 
 // How many items fit per page in each view
 const GRID_PER_PAGE = 16;  // 4 cols × 4 rows
 const LIST_PER_PAGE = 6;  // 6 rows
 
-const MenuGrid = ({ activeCategory, onAddItem, quantities = {}, viewMode = 'grid' }) => {
+const getImageUrl = (url) => {
+  if (!url || url === '/default-image.png') return '/menu/default.png';
+  if (url.startsWith('http')) return url;
+  return `http://localhost:8000${url}`;
+};
+
+const MenuGrid = ({ menuItems = [], activeCategory, onAddItem, quantities = {}, viewMode = 'grid' }) => {
   const [page, setPage] = useState(0);
 
   const perPage = viewMode === 'grid' ? GRID_PER_PAGE : LIST_PER_PAGE;
@@ -25,7 +20,7 @@ const MenuGrid = ({ activeCategory, onAddItem, quantities = {}, viewMode = 'grid
   const filteredItems = useMemo(() => {
     if (activeCategory === 'All Items') return menuItems;
     return menuItems.filter(item => item.category === activeCategory);
-  }, [activeCategory]);
+  }, [activeCategory, menuItems]);
 
   // Reset page when view mode or category changes
   const pageItems = useMemo(() => {
@@ -69,11 +64,11 @@ const MenuGrid = ({ activeCategory, onAddItem, quantities = {}, viewMode = 'grid
                     </span>
                   )}
                   <div className="h-[68px] w-full flex justify-center items-center pt-[4px]">
-                    <img src={item.image} alt={item.name} className="max-h-[60px] max-w-[76px] object-contain" />
+                    <img src={getImageUrl(item.image_url)} alt={item.item_name} className="max-h-[60px] max-w-[76px] object-contain" />
                   </div>
                   <div className="text-center leading-none px-[4px]">
-                    <h3 className="text-[10px] font-semibold text-black leading-[11px] mb-[2px]">{item.name}</h3>
-                    <p className="text-[var(--color-text)] font-semibold text-[9px]">₹{item.price.toFixed(2)}</p>
+                    <h3 className="text-[10px] font-semibold text-black leading-[11px] mb-[2px]">{item.item_name}</h3>
+                    <p className="text-[var(--color-text)] font-semibold text-[9px]">₹{(Number(item.price) || 0).toFixed(2)}</p>
                   </div>
                 </button>
               );
@@ -93,13 +88,13 @@ const MenuGrid = ({ activeCategory, onAddItem, quantities = {}, viewMode = 'grid
                 >
                   {/* Image */}
                   <div className="w-[40px] h-[40px] rounded-[6px] bg-[#f7f6ff] flex items-center justify-center shrink-0 overflow-hidden">
-                    <img src={item.image} alt={item.name} className="w-[34px] h-[34px] object-contain" />
+                    <img src={getImageUrl(item.image_url)} alt={item.item_name} className="w-[34px] h-[34px] object-contain" />
                   </div>
 
                   {/* Name & Price */}
                   <div className="flex-1 min-w-0">
-                    <p className="text-[12px] font-semibold text-[var(--color-text)] truncate leading-[14px]">{item.name}</p>
-                    <p className="text-[11px] font-bold text-[var(--color-primary)] leading-[14px]">₹{item.price.toFixed(2)}</p>
+                    <p className="text-[12px] font-semibold text-[var(--color-text)] truncate leading-[14px]">{item.item_name}</p>
+                    <p className="text-[11px] font-bold text-[var(--color-primary)] leading-[14px]">₹{(Number(item.price) || 0).toFixed(2)}</p>
                   </div>
 
                   {/* Quantity badge */}

@@ -15,15 +15,25 @@ export const AppProvider = ({ children }) => {
   });
 
   // Menu Categories
-  const [categories, setCategories] = useState([
-    { id: '1', name: 'Beverage', iconName: 'Beverage' },
-    { id: '2', name: 'Steamed Bun', iconName: 'SteamedBun' },
-    { id: '3', name: 'Steamed Dimsum', iconName: 'Dimsum' },
-    { id: '4', name: 'Deep Fry Timsun', iconName: 'DeepFry' },
-    { id: '5', name: 'Bake', iconName: 'Bake' },
-    { id: '6', name: 'Noodle/ Dumplings', iconName: 'Noodles' },
-    { id: '7', name: 'Porridge', iconName: 'Porridge' },
-  ]);
+  const [categories, setCategories] = useState([]);
+
+  // Fetch categories on mount
+  useEffect(() => {
+    import('../api/axios').then(({ default: api }) => {
+      api.get('/settings/categories')
+        .then(res => {
+          if (res.data.success) {
+            // Map iconName correctly and ensure ids are strings for frontend consistency
+            const fetchedCats = res.data.data.map(c => ({
+              ...c,
+              id: c.id.toString()
+            }));
+            setCategories(fetchedCats);
+          }
+        })
+        .catch(err => console.error("Failed to load categories:", err));
+    });
+  }, []);
 
   // Allowed pages for current user
   const [currentPermissions, setCurrentPermissions] = useState(() => {

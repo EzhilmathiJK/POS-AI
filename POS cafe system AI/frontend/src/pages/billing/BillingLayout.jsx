@@ -1,6 +1,8 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Icons } from '../../assets/icons';
 import { useAppContext } from '../../context/AppContext';
+import api from '../../api/axios';
 import CurrentBill from './CurrentBill';
 import NumpadInput from './NumpadInput';
 import Categories from './Categories';
@@ -9,14 +11,22 @@ import PurpleActions from './actions/PurpleActions';
 import TealActions from './actions/TealActions';
 import OrangeActions from './actions/OrangeActions';
 import PriceAmendment from './PriceAmendment';
+import ActionModal from '../../components/ui/ActionModal';
 
 const BillingLayout = () => {
-  const { toggleSidebar } = useAppContext();
+  const navigate = useNavigate();
+  const { toggleSidebar, showToast, categories: contextCategories } = useAppContext();
   const [billItems, setBillItems] = useState([]);
+  const [menuItems, setMenuItems] = useState([]);
+  const [dynamicCategories, setDynamicCategories] = useState([]);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [showPriceAmendment, setShowPriceAmendment] = useState(false);
+  const [showNewBillConfirm, setShowNewBillConfirm] = useState(false);
+  const [showDeleteAllConfirm, setShowDeleteAllConfirm] = useState(false);
   const [viewMode, setViewMode] = useState('grid');
   const [activeCategory, setActiveCategory] = useState('All Items');
   const [activeMobileTab, setActiveMobileTab] = useState('cart'); // 'cart' or 'menu'
+  const [tenderAmount, setTenderAmount] = useState(0);
 
   const subtotal = useMemo(
     () => billItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
@@ -25,7 +35,25 @@ const BillingLayout = () => {
 
   const totalAmount = subtotal * 1.07;
 
+  useEffect(() => {
+    const fetchInventory = async () => {
+      try {
+        const response = await api.get('/inventory?limit=1000&sortBy=id&sortOrder=asc');
+        if (response.data.success) {
+          setMenuItems(response.data.data);
+        }
+      } catch (error) {
+        showToast('Failed to load menu items', 'error');
+      }
+    };
+    fetchInventory();
+  }, [showToast]);
+
   const handleAddItem = (item) => {
+    if (showPriceAmendment) {
+      showToast('Please terminate transaction first!', 'warning');
+      return;
+    }
     setBillItems((currentItems) => {
       const existingItem = currentItems.find((billItem) => billItem.id === item.id);
       if (existingItem) {
@@ -46,12 +74,110 @@ const BillingLayout = () => {
     [billItems]
   );
 
+  const handleQuickTender = (amount) => {
+    if (!showPriceAmendment) return;
+    setTenderAmount(prev => prev + amount);
+  };
+
+  const handlePrint = async () => {
+    if (!showPriceAmendment) {
+      showToast('Open Price Amendment first!', 'warning');
+      return;
+    }
+    if (tenderAmount < totalAmount) {
+      showToast(`Insufficient Amount: Total payable is ₹${totalAmount.toFixed(2)}`, 'error');
+      return;
+    }
+
+    try {
+      setIsProcessing(true);
+      const payload = {
+        cart: billItems.map(item => ({
+          id: item.id,
+          item_number: item.item_number || 'UNKNOWN',
+          item_name: item.item_name,
+          quantity: item.quantity,
+          price: item.price
+        })),
+        totalAmount,
+        tenderAmount,
+        balanceAmount: tenderAmount > totalAmount ? tenderAmount - totalAmount : 0
+      };
+
+      const response = await api.post('/billing', payload);
+      if (response.data.success) {
+        showToast('Bill printed successfully.', 'success');
+        setBillItems([]);
+        setShowPriceAmendment(false);
+        setTenderAmount(0);
+      }
+    } catch (error) {
+      showToast(error.response?.data?.message || 'Failed to print bill', 'error');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleTerminate = () => {
+    if (!showPriceAmendment) {
+      showToast('No active transaction to terminate!', 'warning');
+      return;
+    }
+    showToast('Transaction Terminated. Continue billing.', 'info');
+    setShowPriceAmendment(false);
+    setTenderAmount(0);
+  };
+
+  const handleDeleteAll = () => {
+    if (billItems.length === 0) {
+      showToast('Cart is already empty!', 'info');
+      return;
+    }
+    setShowDeleteAllConfirm(true);
+  };
+
+  const confirmDeleteAll = () => {
+    setBillItems([]);
+    setShowPriceAmendment(false);
+    setTenderAmount(0);
+    setShowDeleteAllConfirm(false);
+  };
+
+  const handlePriceAmendmentClick = () => {
+    if (billItems.length === 0) {
+      showToast('Please add items to cart first!', 'error');
+      return;
+    }
+    setShowPriceAmendment(true);
+  };
+
+  const handleNewBill = () => {
+    if (showPriceAmendment) {
+      showToast('Please terminate transaction first!', 'warning');
+      return;
+    }
+    if (billItems.length > 0) {
+      setShowNewBillConfirm(true);
+    } else {
+      setBillItems([]);
+      setShowPriceAmendment(false);
+      setTenderAmount(0);
+    }
+  };
+
+  const confirmNewBill = () => {
+    setBillItems([]);
+    setShowPriceAmendment(false);
+    setTenderAmount(0);
+    setShowNewBillConfirm(false);
+  };
+
   const MobileActionBlocks = () => (
     <div className="flex flex-col gap-[10px] shrink-0 mt-[10px]">
-      <div className="h-[104px]"><PurpleActions onNewBill={() => { setBillItems([]); setShowPriceAmendment(false); }} onPriceAmendmentClick={() => setShowPriceAmendment(true)} /></div>
+      <div className="h-[104px]"><PurpleActions onNewBill={handleNewBill} onPriceAmendmentClick={handlePriceAmendmentClick} onQuickTender={handleQuickTender} /></div>
       <div className="flex flex-col md:flex-row gap-[10px]">
         <div className="h-[90px] md:flex-1"><TealActions /></div>
-        <div className="h-[120px] md:h-[90px] md:flex-1"><OrangeActions /></div>
+        <div className="h-[120px] md:h-[90px] md:flex-1"><OrangeActions onTerminate={handleTerminate} onPrint={handlePrint} onDeleteAll={handleDeleteAll} onMainMenu={() => navigate('/')} /></div>
       </div>
     </div>
   );
@@ -87,21 +213,21 @@ const BillingLayout = () => {
 
         <div className="flex-1 flex gap-[11px] min-h-0">
           <div className="w-[500px] flex flex-col gap-[12px]">
-            {showPriceAmendment ? <PriceAmendment totalAmount={subtotal} gstAmount={totalAmount - subtotal} payable={totalAmount} /> : <CurrentBill items={billItems} onRemoveItem={handleRemoveItem} />}
+            {showPriceAmendment ? <PriceAmendment totalAmount={subtotal} gstAmount={totalAmount - subtotal} payable={totalAmount} tenderAmount={tenderAmount} onTenderChange={setTenderAmount} /> : <CurrentBill items={billItems} onRemoveItem={handleRemoveItem} />}
             <NumpadInput />
           </div>
           <div className="flex shrink-0">
-            <Categories activeCategory={activeCategory} onSelectCategory={setActiveCategory} />
+            <Categories categories={contextCategories} activeCategory={activeCategory} onSelectCategory={setActiveCategory} />
           </div>
           <div className="flex-1 flex flex-col min-w-0">
-            <MenuGrid activeCategory={activeCategory} onAddItem={handleAddItem} quantities={itemQuantities} viewMode={viewMode} />
+            <MenuGrid menuItems={menuItems} activeCategory={activeCategory} onAddItem={handleAddItem} quantities={itemQuantities} viewMode={viewMode} />
           </div>
         </div>
 
         <div className="h-[104px] grid grid-cols-[500px_233px_1fr] gap-[11px] shrink-0 mt-[11px]">
-          <div><PurpleActions onNewBill={() => { setBillItems([]); setShowPriceAmendment(false); }} onPriceAmendmentClick={() => setShowPriceAmendment(true)} /></div>
+          <div><PurpleActions onNewBill={handleNewBill} onPriceAmendmentClick={handlePriceAmendmentClick} onQuickTender={handleQuickTender} /></div>
           <div><TealActions /></div>
-          <div><OrangeActions /></div>
+          <div><OrangeActions onTerminate={handleTerminate} onPrint={handlePrint} onDeleteAll={handleDeleteAll} onMainMenu={() => navigate('/')} /></div>
         </div>
       </div>
 
@@ -165,17 +291,17 @@ const BillingLayout = () => {
           <div className="flex flex-col md:flex-row gap-[10px]">
             {/* Left Column (Active tab on mobile, permanent on tablet) */}
             <div className={`w-full md:w-1/2 flex-col gap-[10px] ${activeMobileTab === 'cart' ? 'flex' : 'hidden md:flex'}`}>
-              {showPriceAmendment ? <PriceAmendment totalAmount={subtotal} gstAmount={totalAmount - subtotal} payable={totalAmount} /> : <CurrentBill items={billItems} onRemoveItem={handleRemoveItem} />}
+              {showPriceAmendment ? <PriceAmendment totalAmount={subtotal} gstAmount={totalAmount - subtotal} payable={totalAmount} tenderAmount={tenderAmount} onTenderChange={setTenderAmount} /> : <CurrentBill items={billItems} onRemoveItem={handleRemoveItem} />}
               <NumpadInput />
             </div>
             
             {/* Right Column (Active tab on mobile, permanent on tablet) */}
             <div className={`w-full md:w-1/2 flex-col gap-[10px] ${activeMobileTab === 'menu' ? 'flex' : 'hidden md:flex'}`}>
               <div className="w-full shrink-0">
-                <Categories activeCategory={activeCategory} onSelectCategory={setActiveCategory} isMobile={true} />
+                <Categories categories={contextCategories} activeCategory={activeCategory} onSelectCategory={setActiveCategory} isMobile={true} />
               </div>
               <div className="w-full flex flex-col shrink-0">
-                <MenuGrid activeCategory={activeCategory} onAddItem={handleAddItem} quantities={itemQuantities} viewMode={viewMode} />
+                <MenuGrid menuItems={menuItems} activeCategory={activeCategory} onAddItem={handleAddItem} quantities={itemQuantities} viewMode={viewMode} />
               </div>
             </div>
           </div>
@@ -183,6 +309,33 @@ const BillingLayout = () => {
           <MobileActionBlocks />
         </div>
       </div>
+
+      {/* Action Modals */}
+      <ActionModal
+        isOpen={showNewBillConfirm}
+        onClose={() => setShowNewBillConfirm(false)}
+        type="warning"
+        title="Open New Bill?"
+        message="Are you sure you want to open a new bill? All items currently in the cart will be removed."
+        primaryAction={{
+          text: 'New Bill',
+          onClick: confirmNewBill
+        }}
+        secondaryAction={{ text: 'Cancel' }}
+      />
+
+      <ActionModal
+        isOpen={showDeleteAllConfirm}
+        onClose={() => setShowDeleteAllConfirm(false)}
+        type="delete"
+        title="Clear Cart?"
+        message="Are you sure you want to remove all items from the current bill?"
+        primaryAction={{
+          text: 'Clear Cart',
+          onClick: confirmDeleteAll
+        }}
+        secondaryAction={{ text: 'Cancel' }}
+      />
     </>
   );
 };

@@ -9,6 +9,7 @@ const router = Router();
 router.use(authenticate);
 router.use(authorize('inventory'));
 
+router.get('/filter-dropdown', inventoryController.getInventoryFilters);
 router.get('/', inventoryController.getInventoryList);
 router.post('/', uploadInventoryImage.single('image'), inventoryController.createInventoryItem);
 router.put('/:id', uploadInventoryImage.single('image'), inventoryController.updateInventoryItem);

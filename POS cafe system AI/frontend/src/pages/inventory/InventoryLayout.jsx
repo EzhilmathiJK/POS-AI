@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import InventoryTopBar from './components/InventoryTopBar';
 import InventoryFilters from './components/InventoryFilters';
 import InventoryTable from './components/InventoryTable';
@@ -13,25 +13,54 @@ const InventoryLayout = () => {
   
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [pagination, setPagination] = useState({ page: 1, limit: 10, totalPages: 1, totalRecords: 0 });
+  const [filters, setFilters] = useState({});
   const { showToast } = useAppContext();
 
-  const fetchItems = async () => {
+  const fetchItems = useCallback(async (currentFilters = filters, page = pagination.page) => {
     try {
       setLoading(true);
-      const res = await api.get('/inventory');
+      const queryParams = new URLSearchParams({
+        page,
+        limit: pagination.limit,
+        ...currentFilters
+      });
+
+      const res = await api.get(`/inventory?${queryParams}`);
       if (res.data.success) {
         setItems(res.data.data);
+        if (res.data.pagination) {
+          setPagination(prev => ({
+            ...prev,
+            page: res.data.pagination.page,
+            totalPages: res.data.pagination.totalPages,
+            totalRecords: res.data.pagination.total
+          }));
+        }
       }
     } catch (error) {
       showToast('Failed to fetch inventory items', 'error');
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters, pagination.page, pagination.limit, showToast]);
 
   useEffect(() => {
     fetchItems();
-  }, []);
+  }, [fetchItems]);
+
+  const handleFilter = (newFilters) => {
+    setFilters(newFilters);
+    fetchItems(newFilters, 1);
+  };
+
+  const handlePageChange = (newPage) => {
+    fetchItems(filters, newPage);
+  };
+
+  const handleLimitChange = (newLimit) => {
+    setPagination(prev => ({ ...prev, limit: newLimit, page: 1 }));
+  };
 
   const handleEditItem = (item) => {
     setSelectedItem(item);
@@ -76,10 +105,13 @@ const InventoryLayout = () => {
         />
       ) : (
         <>
-          <InventoryFilters />
+          <InventoryFilters onFilter={handleFilter} />
           <InventoryTable 
             items={items} 
             loading={loading}
+            pagination={pagination}
+            onPageChange={handlePageChange}
+            onLimitChange={handleLimitChange}
             onAddItem={() => setIsAddingItem(true)} 
             onEditItem={handleEditItem} 
           />

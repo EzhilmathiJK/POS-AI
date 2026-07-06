@@ -11,4 +11,8 @@ router.use(authorize('settings'));
 router.get('/permissions', settingsController.getRolePermissions);
 router.put('/permissions/:role', settingsController.updateRolePermission);
 
+router.get('/categories', settingsController.getCategories);
+router.post('/categories', settingsController.createCategory);
+router.delete('/categories/:id', settingsController.deleteCategory);
+
 export default router;

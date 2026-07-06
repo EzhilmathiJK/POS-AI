@@ -130,3 +130,13 @@ model ItemRequestDetail {
   @@map("item_request_details")
 }
 
+model Category {
+  id         Int      @id @default(autoincrement())
+  name       String   @unique
+  iconName   String
+  is_deleted Boolean  @default(false)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("categories")
+}

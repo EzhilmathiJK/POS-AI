@@ -1,6 +1,12 @@
 import React from 'react';
 import { Icons } from '../../assets/icons';
 
+const getImageUrl = (url) => {
+  if (!url || url === '/default-image.png') return '/menu/default.png';
+  if (url.startsWith('http')) return url;
+  return `http://localhost:8000${url}`;
+};
+
 const CurrentBill = ({ items = [], onRemoveItem }) => {
   const hasItems = items.length > 0;
 
@@ -24,9 +30,9 @@ const CurrentBill = ({ items = [], onRemoveItem }) => {
               >
                 <div className="flex items-center gap-[12px] min-w-0">
                   <div className="w-[32px] h-[32px] rounded-[5px] bg-[#f6f7fb] flex items-center justify-center shrink-0 overflow-hidden">
-                    <img src={item.image} alt={item.name} className="max-w-[26px] max-h-[27px] object-contain" />
+                    <img src={getImageUrl(item.image_url)} alt={item.item_name} className="max-w-[26px] max-h-[27px] object-contain" />
                   </div>
-                  <span className="font-semibold text-[12px] text-[var(--color-text)] truncate">{item.name}</span>
+                  <span className="font-semibold text-[12px] text-[var(--color-text)] truncate">{item.item_name}</span>
                 </div>
 
                 <div className="flex justify-center">
@@ -35,13 +41,13 @@ const CurrentBill = ({ items = [], onRemoveItem }) => {
                   </span>
                 </div>
 
-                <div className="text-center font-normal">₹{item.price.toFixed(2)}</div>
-                <div className="text-center font-normal">₹{(item.price * item.quantity).toFixed(2)}</div>
+                <div className="text-center font-normal">₹{Number(item.price).toFixed(2)}</div>
+                <div className="text-center font-normal">₹{(Number(item.price) * item.quantity).toFixed(2)}</div>
                 <button
                   type="button"
                   onClick={() => onRemoveItem?.(item.id)}
                   className="text-[var(--color-text)] hover:text-red-500 flex items-center justify-center"
-                  aria-label={`Remove ${item.name}`}
+                  aria-label={`Remove ${item.item_name}`}
                 >
                   <Icons.Delete className="text-[12px]" />
                 </button>
@@ -49,7 +55,7 @@ const CurrentBill = ({ items = [], onRemoveItem }) => {
             ))}
           </div>
 
-          <div className="mx-[12px] mb-[10px] h-[61px] bg-[#eef3fb] rounded-[4px] flex items-start gap-[10px] px-[9px] pt-[9px] text-[9px] leading-[14px] text-[var(--color-text)]">
+          <div className="mx-[12px] mt-auto mb-[10px] h-[61px] bg-[#eef3fb] rounded-[4px] flex items-start gap-[10px] px-[9px] pt-[9px] text-[9px] leading-[14px] text-[var(--color-text)] shrink-0">
             <Icons.Info className="text-[14px] text-[var(--color-primary)] shrink-0 mt-[1px]" />
             <p className="font-semibold">
               Click item to create billing entry. If item already exists, quantity will increase.

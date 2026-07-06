@@ -40,3 +40,37 @@ export const updateRolePermission = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getCategories = async (req, res, next) => {
+  try {
+    const categories = await settingsService.fetchAllCategories();
+    res.status(200).json({ success: true, data: categories });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const createCategory = async (req, res, next) => {
+  try {
+    const { name, iconName } = req.body;
+    if (!name || !iconName) {
+      return res.status(400).json({ success: false, message: 'Name and iconName are required' });
+    }
+    const category = await settingsService.createCategory({ name, iconName });
+    res.status(201).json({ success: true, data: category });
+  } catch (error) {
+    if (error.code === 'P2002') {
+      return res.status(400).json({ success: false, message: 'Category already exists' });
+    }
+    next(error);
+  }
+};
+
+export const deleteCategory = async (req, res, next) => {
+  try {
+    await settingsService.deleteCategory(req.params.id);
+    res.status(200).json({ success: true, message: 'Category deleted successfully' });
+  } catch (error) {
+    next(error);
+  }
+};

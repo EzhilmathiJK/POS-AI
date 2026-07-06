@@ -14,11 +14,17 @@ export const getInventoryList = async (query) => {
       { item_number: { contains: query.search, mode: 'insensitive' } }
     ];
   }
-  if (query.category) {
+  if (query.category && query.category !== 'all') {
     filters.category = query.category;
   }
-  if (query.status) {
+  if (query.status && query.status !== 'all') {
     filters.status = query.status;
+  }
+  if (query.dateFrom && query.dateTo) {
+    filters.created_at = {
+      gte: new Date(query.dateFrom),
+      lte: new Date(query.dateTo + 'T23:59:59')
+    };
   }
 
   // Sorting
@@ -96,4 +102,18 @@ export const updateInventoryItem = async (id, data, file) => {
 
 export const deleteInventoryItem = async (id) => {
   return await inventoryRepo.deleteInventoryItem(id);
+};
+
+export const getInventoryFilters = async () => {
+  const items = await prisma.inventory.findMany({
+    select: { category: true, item_name: true, status: true },
+    where: { is_deleted: false },
+    orderBy: { item_name: 'asc' }
+  });
+
+  const categories = [...new Set(items.map(i => i.category).filter(Boolean))];
+  const itemNames = [...new Set(items.map(i => i.item_name).filter(Boolean))];
+  const statuses = [...new Set(items.map(i => i.status).filter(Boolean))];
+
+  return { categories, itemNames, statuses };
 };

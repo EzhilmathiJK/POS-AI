@@ -15,3 +15,15 @@ export const editRolePermission = async (role, data) => {
 
   return await settingsRepo.updateRolePermission(role, data);
 };
+
+export const fetchAllCategories = async () => {
+  return await settingsRepo.getAllCategories();
+};
+
+export const createCategory = async (data) => {
+  return await settingsRepo.createCategory(data);
+};
+
+export const deleteCategory = async (id) => {
+  return await settingsRepo.deleteCategory(id);
+};
