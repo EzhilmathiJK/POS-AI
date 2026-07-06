@@ -168,11 +168,16 @@ const AddInventoryForm = ({ mode = 'add', initialData = null, onCancel, onUpdate
   const handleSubmit = (event) => {
     event.preventDefault();
     if (!validateForm()) return;
-    setModalState({ 
-      isOpen: true, 
-      type: mode === 'add' ? 'submit' : 'submit', 
-      step: mode === 'add' ? 'saveConfirm' : 'updateConfirm' 
-    });
+    
+    if (mode === 'edit') {
+      executeSave();
+    } else {
+      setModalState({ 
+        isOpen: true, 
+        type: 'submit', 
+        step: 'saveConfirm' 
+      });
+    }
   };
 
   const executeSave = async () => {
@@ -407,30 +412,27 @@ const AddInventoryForm = ({ mode = 'add', initialData = null, onCancel, onUpdate
         type={modalState.type}
         title={
           modalState.step === 'saveConfirm' ? 'Add Inventory Item?' :
-          modalState.step === 'updateConfirm' ? 'Update Inventory Item?' :
           modalState.step === 'saveSuccess' ? 'Inventory Item Added!' :
           modalState.step === 'updateSuccess' ? 'Inventory Item Updated!' :
           modalState.step === 'deleteConfirm' ? 'Delete Inventory' : ''
         }
         message={
           modalState.step === 'saveConfirm' ? 'Are you sure you want to add this item to the inventory?' :
-          modalState.step === 'updateConfirm' ? 'Are you sure you want to save these changes to the inventory item?' :
           modalState.step === 'saveSuccess' ? 'The inventory item has been added successfully.' :
           modalState.step === 'updateSuccess' ? 'The inventory item has been updated successfully.' :
           modalState.step === 'deleteConfirm' ? 'Are you sure you want to delete this inventory item? This action cannot be undone.' : ''
         }
         secondaryAction={
-          ['saveConfirm', 'updateConfirm', 'deleteConfirm'].includes(modalState.step) 
+          ['saveConfirm', 'deleteConfirm'].includes(modalState.step) 
             ? { text: 'Cancel', onClick: () => setModalState({ isOpen: false, type: '', step: '' }) } 
             : null
         }
         primaryAction={{
           text: modalState.step === 'saveConfirm' ? 'Yes, Save' :
-                modalState.step === 'updateConfirm' ? 'Yes, Update' :
                 modalState.step === 'saveSuccess' ? 'View Inventory' :
                 modalState.step === 'updateSuccess' ? 'View Inventory' :
                 modalState.step === 'deleteConfirm' ? 'Delete' : '',
-          onClick: ['saveConfirm', 'updateConfirm'].includes(modalState.step) ? executeSave : handleModalPrimaryAction
+          onClick: modalState.step === 'saveConfirm' ? executeSave : handleModalPrimaryAction
         }}
       />
     </section>

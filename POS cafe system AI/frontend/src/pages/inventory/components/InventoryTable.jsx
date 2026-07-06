@@ -1,5 +1,5 @@
 import { Icons } from '../../../assets/icons';
-import { inventoryItems } from '../inventoryData';
+import Pagination from '../../../components/ui/Pagination';
 
 const columns = [
   'Item Name',
@@ -32,20 +32,7 @@ const SortMark = () => (
   </span>
 );
 
-const EntriesSelect = () => (
-  <div className="relative h-[27px] w-[47px]">
-    <select
-      defaultValue="10"
-      aria-label="Inventory entries per page"
-      className="w-full h-full appearance-none rounded-[5px] border border-[var(--color-border)] bg-[#fbfbfd] pl-[11px] pr-[18px] text-[var(--color-text)] font-semibold outline-none focus:border-[var(--color-primary)] cursor-pointer"
-    >
-      <option value="5">5</option>
-      <option value="10">10</option>
-      <option value="20">20</option>
-    </select>
-    <Icons.ChevronDown className="absolute right-[7px] top-[9px] text-[10px] text-[#b2b5c2] pointer-events-none" />
-  </div>
-);
+
 
 const InventoryTable = ({ items = [], loading, onAddItem, onEditItem }) => {
   return (
@@ -148,36 +135,10 @@ const InventoryTable = ({ items = [], loading, onAddItem, onEditItem }) => {
         </table>
       </div>
 
-      {/* Pagination */}
-      <div className="w-full px-[17px] py-[14px] flex flex-col md:flex-row md:items-center justify-between gap-[10px] shrink-0 text-[12px] text-[var(--color-primary)]">
-        
-        <div className="flex items-center justify-between md:justify-start w-full md:w-auto gap-[10px]">
-          <div className="flex items-center gap-[7px] font-semibold">
-            <span>Show</span>
-            <EntriesSelect />
-            <span>entries</span>
-          </div>
-          <p className="font-semibold text-[12px] md:hidden">Showing 1 to 10 of 10 entries</p>
-        </div>
-
-        <div className="flex items-center justify-center gap-[5px] w-full md:w-auto">
-          <button className="w-[28px] h-[28px] rounded-[7px] border border-[var(--color-border)] text-[#b9bdcb] flex items-center justify-center">
-            <Icons.First className="text-[14px]" />
-          </button>
-          <button className="w-[28px] h-[28px] rounded-[7px] border border-[var(--color-border)] text-[#b9bdcb] flex items-center justify-center">
-            <Icons.Prev className="text-[14px]" />
-          </button>
-          <button className="w-[30px] h-[30px] rounded-[7px] bg-[var(--color-primary)] text-white font-semibold">1</button>
-          <button className="w-[28px] h-[28px] rounded-[7px] border border-[var(--color-border)] text-[#b9bdcb] flex items-center justify-center">
-            <Icons.Next className="text-[14px]" />
-          </button>
-          <button className="w-[28px] h-[28px] rounded-[7px] border border-[var(--color-border)] text-[#b9bdcb] flex items-center justify-center">
-            <Icons.Last className="text-[14px]" />
-          </button>
-        </div>
-
-        <p className="text-right font-semibold text-[12px] hidden md:block">Showing 1 to 10 of 10 entries</p>
-      </div>
+      <Pagination 
+        pagination={{ page: 1, totalPages: 1, totalRecords: items.length, limit: 10 }}
+        itemName="entries"
+      />
     </div>
   );
 };

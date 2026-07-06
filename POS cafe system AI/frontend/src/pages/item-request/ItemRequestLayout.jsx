@@ -56,6 +56,10 @@ const ItemRequestLayout = () => {
     fetchItemRequests(filters, newPage);
   };
 
+  const handleLimitChange = (newLimit) => {
+    setPagination(prev => ({ ...prev, limit: newLimit, page: 1 }));
+  };
+
   const handleEditRequest = (request) => {
     setSelectedRequest(request);
     setIsEditingRequest(true);
@@ -101,6 +105,7 @@ const ItemRequestLayout = () => {
             loading={loading}
             pagination={pagination}
             onPageChange={handlePageChange}
+            onLimitChange={handleLimitChange}
             onNewItemRequest={() => setIsAddingRequest(true)} 
             onEditRequest={handleEditRequest} 
           />
