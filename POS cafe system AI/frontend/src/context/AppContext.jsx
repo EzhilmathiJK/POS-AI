@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { toast as toastify } from 'react-toastify';
 import { Icons } from '../assets/icons';
+import { decodeToken } from '../utils/jwt';
 
 const AppContext = createContext();
 
@@ -19,14 +20,27 @@ export const AppProvider = ({ children }) => {
 
   // Allowed pages for current user
   const [currentPermissions, setCurrentPermissions] = useState(() => {
-    const stored = localStorage.getItem('permissions');
-    return stored ? JSON.parse(stored) : {};
+    const token = localStorage.getItem('accessToken');
+    if(!token) return {};
+
+    const decoded = decodeToken(token);
+    return decoded?.permissions || {};
   });
 
   // Current logged in user
   const [currentUser, setCurrentUser] = useState(() => {
-    const stored = localStorage.getItem('user');
-    return stored ? JSON.parse(stored) : null;
+    const token = localStorage.getItem('accessToken');
+    if(!token) return null;
+
+    const decoded = decodeToken(token);
+    if(!decoded) return null;
+
+    return {
+      id: decoded.userId,
+      username: decoded.username,
+      fullname: decoded.fullname,
+      role: decoded.role
+    }
   });
 
   // Fetch settings & categories on mount or login
@@ -141,7 +155,16 @@ export const AppProvider = ({ children }) => {
         
         const data = await response.json();
         if (data.success) {
-          localStorage.setItem('accessToken', data.data.accessToken);
+          const accessToken = data.data.accessToken;
+          localStorage.setItem('accessToken', accessToken);
+          const decoded = decodeToken(accessToken);
+          setCurrentUser({
+            id: decoded.userId,
+            username: decoded.username,
+            fullname: decoded.fullname,
+            role: decoded.role
+          });
+          setCurrentPermissions(decoded.permissions);
           window.dispatchEvent(new CustomEvent('token_refreshed'));
         }
       } catch (error) {

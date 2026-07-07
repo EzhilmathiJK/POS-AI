@@ -39,9 +39,6 @@ export const login = async (req, res, next) => {
     const username = decrypt(req.body.username);
     const password = decrypt(req.body.password);
 
-    console.log("Username:", username);
-console.log("Password:", password);
-
     const authData = await authService.loginUser(username, password);
 
     res.status(200).json({
@@ -66,13 +63,29 @@ export const refreshToken = async (req, res, next) => {
       return res.status(401).json({ success: false, message: 'Invalid or expired refresh token', errors: [] });
     }
 
-    // Check if user still exists
-    const { user } = await authService.getUserWithPermissions(payload.userId);
+    // Check if user still exists, is active, and fetch fresh permissions
+    // This is crucial: Access tokens are stateless, but Refresh tokens MUST hit the DB
+    // so we can revoke access or update permissions without forcing a re-login.
+    const { user, permissions } = await authService.getUserWithPermissions(payload.userId);
+
+    if (!user.is_active || user.is_deleted) {
+      return res.status(403).json({ success: false, message: 'User account is deactivated', errors: [] });
+    }
 
     const jwtPayload = {
       userId: user.id,
-      role: user.role,
+      username: user.username,
       fullname: user.full_name,
+      role: user.role,
+      permissions: {
+        dashboard: permissions.dashboard,
+        billing: permissions.billing,
+        inventory: permissions.inventory,
+        item_request: permissions.item_request,
+        sales_report: permissions.sales_report,
+        users: permissions.users,
+        settings: permissions.settings,
+      }
     };
 
     const newAccessToken = generateAccessToken(jwtPayload);

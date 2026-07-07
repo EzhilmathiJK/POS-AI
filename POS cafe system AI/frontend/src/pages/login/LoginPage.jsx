@@ -5,6 +5,7 @@ import api from '../../api/axios';
 import { useAppContext } from '../../context/AppContext';
 import './LoginPage.css';
 import { encrypt } from '../../utils/encryption';
+import { decodeToken } from '../../utils/jwt';
 
 const LoginPage = () => {
   const [authMode, setAuthMode] = useState('login');
@@ -45,14 +46,19 @@ const LoginPage = () => {
       });
 
       if (response.data.success) {
-        const { accessToken, refreshToken, user, permissions } = response.data.data;
+        const { accessToken, refreshToken } = response.data.data;
         localStorage.setItem('accessToken', accessToken);
         localStorage.setItem('refreshToken', refreshToken);
-        localStorage.setItem('user', JSON.stringify(user));
-        localStorage.setItem('permissions', JSON.stringify(permissions));
+
+        const decoded = decodeToken(accessToken);
         
-        setCurrentUser(user);
-        setCurrentPermissions(permissions);
+        setCurrentUser({
+          id: decoded.userId,
+          username: decoded.username,
+          fullname: decoded.fullname,
+          role: decoded.role
+        });
+        setCurrentPermissions(decoded.permissions);
         
         navigate('/dashboard');
       }

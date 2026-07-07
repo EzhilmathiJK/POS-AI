@@ -16,22 +16,13 @@ export const authenticate = async (req, res, next) => {
     }
 
     req.user = {
-      id: decoded.id,
+      id: decoded.userId,
       username: decoded.username,
       fullname: decoded.fullname,
       role: decoded.role
     };
 
     req.permissions = decoded.permissions;
-
-    if (!user.is_active || user.is_deleted) {
-      return res.status(403).json({ success: false, message: 'User account is deactivated or deleted', errors: [] });
-    }
-
-    // Attach both user and permissions to the request
-    req.user = user;
-    req.permissions = permissions;
-
     next();
   } catch (error) {
     next(error);

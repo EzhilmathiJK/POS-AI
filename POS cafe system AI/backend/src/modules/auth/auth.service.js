@@ -82,9 +82,6 @@ export const loginUser = async (username, password) => {
   const accessToken = generateAccessToken(jwtPayload);
   const refreshToken = generateRefreshToken(jwtPayload);
 
-  // Omit password
-  const { password: _, ...userWithoutPassword } = user;
-
   return {
     accessToken,
     refreshToken,
