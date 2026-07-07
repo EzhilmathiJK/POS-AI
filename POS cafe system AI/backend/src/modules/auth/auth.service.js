@@ -30,7 +30,7 @@ export const registerUser = async (userData) => {
     username,
     email,
     password: hashedPassword,
-    role: ROLES.STAFF, 
+    role: ROLES.STAFF,
   });
 
   // Omit password from return object
@@ -64,8 +64,19 @@ export const loginUser = async (username, password) => {
   // 4. Generate Tokens
   const jwtPayload = {
     userId: user.id,
-    role: user.role,
+    username: user.username,
     fullname: user.full_name,
+    role: user.role,
+
+    permissions: {
+      dashboard: permissions.dashboard,
+      billing: permissions.billing,
+      inventory: permissions.inventory,
+      item_request: permissions.item_request,
+      sales_report: permissions.sales_report,
+      users: permissions.users,
+      settings: permissions.settings,
+    }
   };
 
   const accessToken = generateAccessToken(jwtPayload);
@@ -75,8 +86,6 @@ export const loginUser = async (username, password) => {
   const { password: _, ...userWithoutPassword } = user;
 
   return {
-    user: userWithoutPassword,
-    permissions,
     accessToken,
     refreshToken,
   };

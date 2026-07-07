@@ -164,11 +164,12 @@ export const getRecentTransactions = async () => {
 };
 
 export const getLowStockAlerts = async () => {
-  // Find top 4 items with stock <= minimum_stock (or stock < 10 for demo if min stock not used)
   const items = await prisma.inventory.findMany({
     where: {
       is_deleted: false,
-      // Just fetching those with lowest stock first
+      status: {
+        in: ['Low Stock', 'Out of Stock']
+      }
     },
     orderBy: {
       in_stock: 'asc'

@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8000/api',
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -75,7 +75,7 @@ api.interceptors.response.use(
           }
 
           return new Promise(function (resolve, reject) {
-            axios.post('http://localhost:8000/api/auth/refresh-token', { token: refreshToken })
+            axios.post(`${import.meta.env.VITE_API_URL}/auth/refresh-token`, { token: refreshToken })
               .then(({ data }) => {
                 if (data.success) {
                   const newAccessToken = data.data.accessToken;

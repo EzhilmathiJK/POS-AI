@@ -1,6 +1,7 @@
 import * as authService from './auth.service.js';
 import { validationResult } from 'express-validator';
 import { verifyToken, generateAccessToken } from '../../utils/jwt.util.js';
+import { decrypt } from '../../utils/encryption.util.js';
 
 // Helper to handle validation errors in controllers
 const handleValidationErrors = (req, res) => {
@@ -35,7 +36,12 @@ export const login = async (req, res, next) => {
   try {
     if (handleValidationErrors(req, res)) return;
 
-    const { username, password } = req.body;
+    const username = decrypt(req.body.username);
+    const password = decrypt(req.body.password);
+
+    console.log("Username:", username);
+console.log("Password:", password);
+
     const authData = await authService.loginUser(username, password);
 
     res.status(200).json({

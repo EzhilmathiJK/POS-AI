@@ -15,8 +15,14 @@ export const authenticate = async (req, res, next) => {
       return res.status(401).json({ success: false, message: 'Invalid or expired token', errors: [] });
     }
 
-    // Load user and permissions from database
-    const { user, permissions } = await authService.getUserWithPermissions(decoded.userId);
+    req.user = {
+      id: decoded.id,
+      username: decoded.username,
+      fullname: decoded.fullname,
+      role: decoded.role
+    };
+
+    req.permissions = decoded.permissions;
 
     if (!user.is_active || user.is_deleted) {
       return res.status(403).json({ success: false, message: 'User account is deactivated or deleted', errors: [] });

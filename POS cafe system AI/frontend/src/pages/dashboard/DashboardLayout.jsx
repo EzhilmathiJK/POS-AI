@@ -1,3 +1,5 @@
+import { useState, useEffect } from 'react';
+import api from '../../api/axios';
 import { Icons } from '../../assets/icons';
 import DashboardTopBar from './components/DashboardTopBar';
 import MetricCard from './components/MetricCard';
@@ -8,6 +10,28 @@ import LowStockAlerts from './components/LowStockAlerts';
 import QuickActions from './components/QuickActions';
 
 const DashboardLayout = () => {
+  const [stats, setStats] = useState({
+    totalSales: 0,
+    totalOrders: 0,
+    totalUsers: 0,
+    averageOrderValue: 0,
+    totalProducts: 0
+  });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await api.get('/dashboard/stats');
+        if (response.data.success) {
+          setStats(response.data.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch dashboard stats", error);
+      }
+    };
+    fetchStats();
+  }, []);
+
   return (
     // Outer: full height, flex column, header fixed, rest scrollable
     <div className="flex flex-col h-full bg-[var(--color-app-bg)] overflow-hidden w-full min-w-0">
@@ -22,11 +46,11 @@ const DashboardLayout = () => {
 
         {/* Row 1: Metric Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-[12px] shrink-0 w-full min-w-0">
-          <MetricCard icon={Icons.ItemRequest} iconBgColor="#f3e8fd" iconColor="var(--color-primary)" title="Total Sales" value="8962.98" change="0" isPositive={true} />
-          <MetricCard icon={Icons.Lock} iconBgColor="#fdf0e6" iconColor="#f58025" title="Total Orders" value="14" change="0" isPositive={true} />
-          <MetricCard icon={Icons.User} iconBgColor="#e8f0fe" iconColor="#1a73e8" title="Total Users" value="10" change="0" isPositive={true} />
-          <MetricCard icon={Icons.SalesReport} iconBgColor="#f3e8fd" iconColor="var(--color-primary)" title="Average Order Value" value="640.21" change="0" isPositive={true} />
-          <MetricCard icon={Icons.Inventory} iconBgColor="#e6f4ea" iconColor="#00a711" title="Total Products" value="22" change="0" isPositive={true} />
+          <MetricCard icon={Icons.ItemRequest} iconBgColor="#f3e8fd" iconColor="var(--color-primary)" title="Total Sales" value={`₹${stats.totalSales.toFixed(2)}`} change="0" isPositive={true} />
+          <MetricCard icon={Icons.Lock} iconBgColor="#fdf0e6" iconColor="#f58025" title="Total Orders" value={stats.totalOrders} change="0" isPositive={true} />
+          <MetricCard icon={Icons.User} iconBgColor="#e8f0fe" iconColor="#1a73e8" title="Total Users" value={stats.totalUsers} change="0" isPositive={true} />
+          <MetricCard icon={Icons.SalesReport} iconBgColor="#f3e8fd" iconColor="var(--color-primary)" title="Average Order Value" value={`₹${stats.averageOrderValue.toFixed(2)}`} change="0" isPositive={true} />
+          <MetricCard icon={Icons.Inventory} iconBgColor="#e6f4ea" iconColor="#00a711" title="Total Products" value={stats.totalProducts} change="0" isPositive={true} />
         </div>
 
         {/* Row 2: Charts */}

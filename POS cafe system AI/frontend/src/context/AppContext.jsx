@@ -110,9 +110,11 @@ export const AppProvider = ({ children }) => {
         const decoded = JSON.parse(jsonPayload);
         const exp = decoded.exp * 1000;
         const now = Date.now();
+
+        const REFRESH_BUFFER = Number(import.meta.env.VITE_REFRESH_BEFORE_EXPIRATION) || 30000; // Default to 30 seconds
         
         // Trigger refresh 30 seconds before expiration
-        const timeUntilRefresh = (exp - now) - 30000;
+        const timeUntilRefresh = (exp - now) - REFRESH_BUFFER;
         
         if (timeUntilRefresh <= 0) {
           doRefreshToken();
@@ -131,7 +133,7 @@ export const AppProvider = ({ children }) => {
         const refreshToken = localStorage.getItem('refreshToken');
         if (!refreshToken) return;
         
-        const response = await fetch('http://localhost:8000/api/auth/refresh-token', {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/refresh-token`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ token: refreshToken })

@@ -4,6 +4,7 @@ import { Icons } from '../../assets/icons';
 import api from '../../api/axios';
 import { useAppContext } from '../../context/AppContext';
 import './LoginPage.css';
+import { encrypt } from '../../utils/encryption';
 
 const LoginPage = () => {
   const [authMode, setAuthMode] = useState('login');
@@ -39,8 +40,8 @@ const LoginPage = () => {
 
     try {
       const response = await api.post('/auth/login', {
-        username: loginData.username,
-        password: loginData.password,
+        username: encrypt(loginData.username),
+        password: encrypt(loginData.password),
       });
 
       if (response.data.success) {

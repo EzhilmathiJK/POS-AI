@@ -10,6 +10,8 @@ const router = express.Router();
 router.get('/general', settingsController.getGeneralSettings);
 
 router.use(authenticate);
+router.get('/categories', settingsController.getCategories);
+
 router.use(authorize('settings'));
 
 router.put('/general', uploadSettingsLogo.single('cafe_logo'), settingsController.updateGeneralSettings);
@@ -18,7 +20,6 @@ router.put('/inventory', settingsController.updateInventorySettings);
 router.get('/permissions', settingsController.getRolePermissions);
 router.put('/permissions/:role', settingsController.updateRolePermission);
 
-router.get('/categories', settingsController.getCategories);
 router.post('/categories', settingsController.createCategory);
 router.delete('/categories/:id', settingsController.deleteCategory);
 
