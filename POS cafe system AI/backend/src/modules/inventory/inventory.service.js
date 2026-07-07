@@ -48,7 +48,7 @@ export const getInventoryList = async (query) => {
 
 export const createInventoryItem = async (data, file) => {
   const inStock = parseInt(data.in_stock) || 0;
-  const status = calculateStock(inStock);
+  const status = await calculateStock(inStock);
   const item_number = await generateItemNumber();
   
   const newItemData = {
@@ -81,7 +81,7 @@ export const updateInventoryItem = async (id, data, file) => {
   }
 
   // Ignore in_stock, purchased, sold from update data
-  const status = calculateStock(currentItem.in_stock);
+  const status = await calculateStock(currentItem.in_stock);
 
   const updateData = {
     item_name: data.item_name !== undefined ? data.item_name : currentItem.item_name,

@@ -512,3 +512,19 @@
     margin-top: 30px;
   }
 }
+
+@media (max-width: 1024px) {
+  .login-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .login-visual {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .login-form-wrap {
+    width: min(400px, calc(100% - 40px));
+  }
+}

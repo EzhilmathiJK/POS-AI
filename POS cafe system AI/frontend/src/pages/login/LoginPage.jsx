@@ -8,7 +8,7 @@ import './LoginPage.css';
 const LoginPage = () => {
   const [authMode, setAuthMode] = useState('login');
   const navigate = useNavigate();
-  const { setCurrentUser, setCurrentPermissions, showToast } = useAppContext();
+  const { settings, setCurrentUser, setCurrentPermissions, showToast } = useAppContext();
   const isRegistering = authMode === 'register';
 
   // Form states
@@ -106,13 +106,17 @@ const LoginPage = () => {
   return (
     <main className="login-page">
       <section className="login-shell">
-        <section className="login-visual" aria-label="POS Cafe preview">
+        <section className="login-visual" aria-label={`${settings.cafeName} preview`}>
           <div className="login-hero-content">
-            <div className="login-hero-logo">
-              <Icons.Logo />
+            <div className="login-hero-logo p-2 bg-[var(--color-primary)] text-white rounded-full">
+              {settings.logo !== '/default-image.png' ? (
+                <img src={settings.logo} alt="Logo" className="w-[32px] h-[32px] object-contain invert brightness-0" />
+              ) : (
+                <Icons.Logo className="text-[24px]" />
+              )}
             </div>
 
-            <h2>POS Cafe</h2>
+            <h2>{settings.cafeName}</h2>
             <p className="login-hero-subtitle">Point of Sale System</p>
             <span className="login-hero-rule" />
 
@@ -155,14 +159,18 @@ const LoginPage = () => {
           </div>
 
           <div className="login-form-wrap">
-            <div className="login-logo">
-              <Icons.Logo />
+            <div className="login-logo p-2 bg-[var(--color-primary)] text-white rounded-full mx-auto w-fit mb-4">
+              {settings.logo !== '/default-image.png' ? (
+                <img src={settings.logo} alt="Logo" className="w-[40px] h-[40px] object-contain invert brightness-0" />
+              ) : (
+                <Icons.Logo className="text-[32px]" />
+              )}
             </div>
 
             {isRegistering ? (
               <>
                 <h1 id="auth-title" className="register-title">Create Your Account</h1>
-                <p className="login-subtitle">Join POS Cafe and start managing your business smarter.</p>
+                <p className="login-subtitle">Join {settings.cafeName} and start managing your business smarter.</p>
 
                 {error && <div className="text-red-500 text-sm font-semibold mb-4 bg-red-100 p-2 rounded">{error}</div>}
 
@@ -282,7 +290,7 @@ const LoginPage = () => {
             ) : (
               <>
                 <h1 id="auth-title">Welcome Back!</h1>
-                <p className="login-subtitle">Sign in to continue to POS Cafe</p>
+                <p className="login-subtitle">Sign in to continue to {settings.cafeName}</p>
 
                 {error && <div className="text-red-500 text-sm font-semibold mb-4 bg-red-100 p-2 rounded">{error}</div>}
 
@@ -353,7 +361,7 @@ const LoginPage = () => {
             )}
           </div>
 
-          <p className="login-copyright">&copy; 2026 POS Cafe. All rights reserved.</p>
+          <p className="login-copyright">&copy; {new Date().getFullYear()} {settings.cafeName}. All rights reserved.</p>
         </section>
       </section>
     </main>

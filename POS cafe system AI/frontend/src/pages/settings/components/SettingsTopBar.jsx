@@ -3,7 +3,7 @@ import { Icons } from '../../../assets/icons';
 import { useAppContext } from '../../../context/AppContext';
 
 const SettingsTopBar = () => {
-  const { toggleSidebar } = useAppContext();
+  const { toggleSidebar, settings } = useAppContext();
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
@@ -33,7 +33,7 @@ const SettingsTopBar = () => {
         <div className="h-full flex items-center gap-[9px] pl-[15px] pr-[17px]">
           <Icons.Clock className="text-[17px] text-[var(--color-primary)]" />
           <span className="text-[12px] font-semibold">
-            {time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+            {time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: settings?.timeFormat === '12h' })}
           </span>
         </div>
       </div>

@@ -236,7 +236,7 @@ const NewItemRequestForm = ({ mode = 'add', initialData = null, onCancel, onUpda
   };
 
   return (
-    <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar px-[18px] md:px-[50px] lg:px-[154px] pb-[18px]">
+    <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar pb-[18px]">
       <section className="mt-[27px] bg-white rounded-[6px] border border-[var(--color-border)] shadow-[0_1px_2px_rgba(3,4,90,0.08)] px-[18px] pt-[21px] pb-[19px]">
         <h2 className="text-[17px] leading-[20px] font-bold text-[var(--color-text)] mb-[18px]">Request Information</h2>
 

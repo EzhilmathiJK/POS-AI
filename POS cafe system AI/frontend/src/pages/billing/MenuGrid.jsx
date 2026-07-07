@@ -70,6 +70,9 @@ const MenuGrid = ({ menuItems = [], activeCategory, onAddItem, quantities = {}, 
                     <h3 className="text-[10px] font-semibold text-black leading-[11px] mb-[2px]">{item.item_name}</h3>
                     <p className="text-[var(--color-text)] font-semibold text-[9px]">₹{(Number(item.price) || 0).toFixed(2)}</p>
                   </div>
+                  <span className="absolute bottom-[2px] right-[2px] min-w-[16px] px-[2px] py-[1px] text-[9px] font-bold text-[#1e1c70] bg-white border border-[var(--color-border)] rounded-[3px] text-center">
+                    {item.id}
+                  </span>
                 </button>
               );
             })}

@@ -1,5 +1,6 @@
 import { Icons } from '../../../assets/icons';
 import Pagination from '../../../components/ui/Pagination';
+import { useAppContext } from '../../../context/AppContext';
 
 const columns = [
   'Request ID',
@@ -26,6 +27,7 @@ const SortMark = () => (
 );
 
 const ItemRequestTable = ({ requests, loading, pagination, onPageChange, onLimitChange, onNewItemRequest, onEditRequest }) => {
+  const { settings } = useAppContext();
   const totalRecords = pagination?.totalRecords || 0;
 
   return (
@@ -85,7 +87,7 @@ const ItemRequestTable = ({ requests, loading, pagination, onPageChange, onLimit
                 
                 const created = new Date(request.created_at || request.request_date);
                 const reqDate = `${String(created.getDate()).padStart(2, '0')}-${String(created.getMonth() + 1).padStart(2, '0')}-${created.getFullYear()}`;
-                const reqTime = created.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+                const reqTime = created.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: settings?.timeFormat !== '24h' });
 
                 return (
                   <tr key={request.id} className="h-[64px] border-b border-[#deddf6] last:border-b-0 hover:bg-gray-50 transition-colors">

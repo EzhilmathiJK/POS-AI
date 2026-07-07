@@ -15,7 +15,7 @@ import ActionModal from '../../components/ui/ActionModal';
 
 const BillingLayout = () => {
   const navigate = useNavigate();
-  const { toggleSidebar, showToast, categories: contextCategories } = useAppContext();
+  const { toggleSidebar, showToast, categories: contextCategories, settings } = useAppContext();
   const [billItems, setBillItems] = useState([]);
   const [menuItems, setMenuItems] = useState([]);
   const [dynamicCategories, setDynamicCategories] = useState([]);
@@ -33,7 +33,8 @@ const BillingLayout = () => {
     [billItems]
   );
 
-  const totalAmount = subtotal * 1.07;
+  const gstRate = (settings?.gst ?? 7) / 100;
+  const totalAmount = subtotal * (1 + gstRate);
 
   useEffect(() => {
     const fetchInventory = async () => {
@@ -49,20 +50,39 @@ const BillingLayout = () => {
     fetchInventory();
   }, [showToast]);
 
-  const handleAddItem = (item) => {
+  const handleAddItem = (item, quantityToAdd = 1) => {
     if (showPriceAmendment) {
       showToast('Please terminate transaction first!', 'warning');
       return;
     }
+
+    const currentQtyInCart = billItems.find((billItem) => billItem.id === item.id)?.quantity || 0;
+    if (currentQtyInCart + quantityToAdd > item.in_stock) {
+      showToast(`Out of Stock: ${item.item_name} only has ${item.in_stock} left!`, 'error');
+      return;
+    }
+
     setBillItems((currentItems) => {
       const existingItem = currentItems.find((billItem) => billItem.id === item.id);
       if (existingItem) {
         return currentItems.map((billItem) =>
-          billItem.id === item.id ? { ...billItem, quantity: billItem.quantity + 1 } : billItem
+          billItem.id === item.id ? { ...billItem, quantity: billItem.quantity + quantityToAdd } : billItem
         );
       }
-      return [...currentItems, { ...item, quantity: 1 }];
+      return [...currentItems, { ...item, quantity: quantityToAdd }];
     });
+  };
+
+  const handleNumpadAdd = (itemNumber, quantity) => {
+    if (!itemNumber) return;
+    
+    // Convert to string and find in menu items (by id or item_number)
+    const target = menuItems.find(i => String(i.id) === String(itemNumber) || String(i.item_number) === String(itemNumber));
+    if (target) {
+      handleAddItem(target, quantity);
+    } else {
+      showToast(`Item number ${itemNumber} not found`, 'error');
+    }
   };
 
   const handleRemoveItem = (itemId) => {
@@ -214,7 +234,7 @@ const BillingLayout = () => {
         <div className="flex-1 flex gap-[11px] min-h-0">
           <div className="w-[500px] flex flex-col gap-[12px]">
             {showPriceAmendment ? <PriceAmendment totalAmount={subtotal} gstAmount={totalAmount - subtotal} payable={totalAmount} tenderAmount={tenderAmount} onTenderChange={setTenderAmount} /> : <CurrentBill items={billItems} onRemoveItem={handleRemoveItem} />}
-            <NumpadInput />
+            <NumpadInput onAdd={handleNumpadAdd} />
           </div>
           <div className="flex shrink-0">
             <Categories categories={contextCategories} activeCategory={activeCategory} onSelectCategory={setActiveCategory} />
@@ -292,7 +312,7 @@ const BillingLayout = () => {
             {/* Left Column (Active tab on mobile, permanent on tablet) */}
             <div className={`w-full md:w-1/2 flex-col gap-[10px] ${activeMobileTab === 'cart' ? 'flex' : 'hidden md:flex'}`}>
               {showPriceAmendment ? <PriceAmendment totalAmount={subtotal} gstAmount={totalAmount - subtotal} payable={totalAmount} tenderAmount={tenderAmount} onTenderChange={setTenderAmount} /> : <CurrentBill items={billItems} onRemoveItem={handleRemoveItem} />}
-              <NumpadInput />
+              <NumpadInput onAdd={handleNumpadAdd} />
             </div>
             
             {/* Right Column (Active tab on mobile, permanent on tablet) */}

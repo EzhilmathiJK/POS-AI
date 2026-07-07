@@ -110,7 +110,7 @@ const AddInventoryForm = ({ mode = 'add', initialData = null, onCancel, onUpdate
     }
   }, [mode, initialData]);
 
-  const { showToast } = useAppContext();
+  const { showToast, categories = [] } = useAppContext();
   const [modalState, setModalState] = useState({ isOpen: false, type: '', step: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -321,7 +321,7 @@ const AddInventoryForm = ({ mode = 'add', initialData = null, onCancel, onUpdate
               <SelectInput 
                 placeholder="Select category" 
                 value={formData.category}
-                options={['Beverage', 'Steamed Bun', 'Dimsum', 'Deep Fry', 'Bake', 'Noodles', 'Porridge']} 
+                options={categories.map(c => c.name)} 
                 onChange={(e) => handleInputChange('category', e.target.value)}
               />
               {errors.category && <p className="mt-[8px] text-[11px] leading-[13px] font-semibold text-[#ff1e27]">{errors.category}</p>}

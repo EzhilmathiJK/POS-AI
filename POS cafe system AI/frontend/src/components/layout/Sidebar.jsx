@@ -3,7 +3,7 @@ import { Icons } from '../../assets/icons';
 import { useAppContext } from '../../context/AppContext';
 
 const Sidebar = () => {
-  const { currentPermissions, currentUser, setCurrentUser, setCurrentPermissions, isSidebarOpen, setIsSidebarOpen } = useAppContext();
+  const { settings, currentPermissions, currentUser, setCurrentUser, setCurrentPermissions, isSidebarOpen, setIsSidebarOpen } = useAppContext();
   const navigate = useNavigate();
 
   const allNavItems = [
@@ -49,10 +49,14 @@ const Sidebar = () => {
         }`}
       >
         <div className="flex flex-col items-center justify-center pt-5 pb-7">
-          <div className="bg-[var(--color-primary)] w-[44px] h-[44px] rounded-full flex items-center justify-center mb-[10px]">
-            <Icons.Logo className="text-white text-[24px]" />
+          <div className="bg-[var(--color-primary)] w-[44px] h-[44px] rounded-full flex items-center justify-center mb-[10px] overflow-hidden">
+            {settings?.logo && settings.logo !== '/default-image.png' ? (
+              <img src={settings.logo} alt="Logo" className="w-[28px] h-[28px] object-contain invert brightness-0" />
+            ) : (
+              <Icons.Logo className="text-white text-[24px]" />
+            )}
           </div>
-          <h2 className="text-[17px] font-extrabold tracking-[-0.01em]">POS Cafe</h2>
+          <h2 className="text-[17px] font-extrabold tracking-[-0.01em] text-center px-2">{settings?.cafeName || 'POS Cafe'}</h2>
         </div>
 
         <nav className="flex-1 px-[5px] space-y-[5px]">

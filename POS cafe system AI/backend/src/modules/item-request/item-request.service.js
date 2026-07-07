@@ -1,5 +1,6 @@
 import prisma from '../../config/prisma.js';
 import { calculateStock } from '../../utils/inventory.helpers.js';
+import { generateRequestNumber, getSubmitStatus } from '../../utils/request.helper.js';
 
 // Auto-update logic: Process any "On The Way" requests that have reached their delivery date
 const processReceivedRequests = async (tx) => {
@@ -35,7 +36,7 @@ const processReceivedRequests = async (tx) => {
         data: {
           purchased: newPurchased,
           in_stock: newInStock,
-          status: calculateStock(newInStock),
+          status: await calculateStock(newInStock),
         }
       });
     }
@@ -51,35 +52,16 @@ const processReceivedRequests = async (tx) => {
   }
 };
 
-const generateRequestNumber = async (tx) => {
-  const lastRequest = await tx.itemRequestHeader.findFirst({
-    orderBy: { id: 'desc' }
-  });
 
-  if (!lastRequest) {
-    return 'REQ-000001';
-  }
-  const lastNumber = parseInt(lastRequest.request_number.split('-')[1], 10);
-  return `REQ-${String(lastNumber + 1).padStart(6, '0')}`;
-};
-
-const getSubmitStatus = (deliveryDate) => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const delivery = new Date(deliveryDate);
-  delivery.setHours(0, 0, 0, 0);
-
-  if (delivery <= today) {
-    return 'Received';
-  }
-  return 'On The Way';
-};
 
 export const createItemRequest = async (data, requestedBy) => {
   return await prisma.$transaction(async (tx) => {
     const { subject, deliveryDate, items } = data;
-    const requestNo = await generateRequestNumber(tx);
+    
+    const lastRequest = await tx.itemRequestHeader.findFirst({
+      orderBy: { id: 'desc' }
+    });
+    const requestNo = generateRequestNumber(lastRequest);
 
     const itemRequest = await tx.itemRequestHeader.create({
       data: {
@@ -125,7 +107,7 @@ export const submitItemRequest = async (id) => {
             data: {
               purchased: inventoryItem.purchased + item.quantity,
               in_stock: newInStock,
-              status: calculateStock(newInStock),
+              status: await calculateStock(newInStock),
             }
           });
         }
@@ -203,12 +185,11 @@ export const getAllItemRequests = async (pagination, filters) => {
     const limit = Number(pagination.limit) || 10;
     const offset = (page - 1) * limit;
     
-    const { requestNo, subject, requestedBy, status, dateFrom, dateTo } = filters;
+    const { requestNo, subject, requestedBy, dateFrom, dateTo } = filters;
     const where = {};
 
     if (requestNo && requestNo !== 'all') where.request_number = requestNo;
     if (requestedBy && requestedBy !== 'all') where.requested_by = requestedBy;
-    if (status && status !== 'all') where.status = status;
     if (subject && subject.trim() !== '') where.subject = { contains: subject.trim(), mode: 'insensitive' };
     
     if (dateFrom && dateTo) {

@@ -1,8 +1,15 @@
+import { useState, useEffect } from 'react';
 import { Icons } from '../../../assets/icons';
 import { useAppContext } from '../../../context/AppContext';
 
 const InventoryTopBar = ({ isAddingItem = false, isEditingItem = false, onNavigateBack }) => {
-  const { toggleSidebar } = useAppContext();
+  const { toggleSidebar, settings } = useAppContext();
+  const [time, setTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   return (
     <header className="h-[76px] flex items-center justify-between shrink-0">
@@ -27,13 +34,15 @@ const InventoryTopBar = ({ isAddingItem = false, isEditingItem = false, onNaviga
         <div className="h-full flex items-center gap-[9px] pl-[12px] pr-[17px] border-r border-[#e4e2fa]">
           <Icons.Calendar className="text-[17px] text-[var(--color-primary)]" />
           <div className="text-[12px] font-semibold leading-[14px]">
-            <div>01 Jul 2026</div>
-            <div>Wednesday</div>
+            <div>{time.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
+            <div>{time.toLocaleDateString('en-US', { weekday: 'long' })}</div>
           </div>
         </div>
         <div className="h-full flex items-center gap-[9px] pl-[15px] pr-[17px]">
           <Icons.Clock className="text-[17px] text-[var(--color-primary)]" />
-          <span className="text-[12px] font-semibold">12:27 PM</span>
+          <span className="text-[12px] font-semibold">
+            {time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: settings?.timeFormat === '12h' })}
+          </span>
         </div>
       </div>
     </header>

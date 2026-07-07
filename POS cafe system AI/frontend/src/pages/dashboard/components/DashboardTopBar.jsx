@@ -26,7 +26,9 @@ const DashboardTopBar = () => {
       <div className="flex items-center gap-[16px]">
         <div className="hidden md:flex items-center h-[36px] rounded-[8px] bg-white border border-[#deddf6] px-[12px] cursor-pointer hover:bg-gray-50">
           <Icons.Calendar className="text-[14px] text-[var(--color-text)] mr-[8px]" />
-          <span className="text-[12px] font-semibold text-[var(--color-text)] mr-[8px]">22 Jun 2026</span>
+          <span className="text-[12px] font-semibold text-[var(--color-text)] mr-[8px]">
+            {new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+          </span>
           <Icons.ChevronDown className="text-[12px] text-[#9b9ab1]" />
         </div>
         

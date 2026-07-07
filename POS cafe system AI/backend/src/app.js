@@ -21,7 +21,7 @@ app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 // 3. Rate Limiting (Basic Protection)
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+  max: 2000, // Limit each IP to 2000 requests per `window` (here, per 15 minutes)
   message: 'Too many requests from this IP, please try again after 15 minutes',
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
@@ -35,6 +35,8 @@ import settingsRoutes from './modules/settings/settings.routes.js';
 import inventoryRoutes from './modules/inventory/inventory.routes.js';
 import billingRoutes from './modules/billing/billing.routes.js';
 import itemRequestRoutes from './modules/item-request/item-request.routes.js';
+import salesReportRoutes from './modules/sales-report/sales-report.routes.js';
+import dashboardRoutes from './modules/dashboard/dashboard.routes.js';
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', usersRoutes);
@@ -42,6 +44,8 @@ app.use('/api/settings', settingsRoutes);
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/billing', billingRoutes);
 app.use('/api/item-requests', itemRequestRoutes);
+app.use('/api/sales-report', salesReportRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 // 5. 404 Handler for undefined routes
 app.use((req, res, next) => {
@@ -54,3 +58,6 @@ app.use((req, res, next) => {
 app.use(errorHandler);
 
 export default app;
+
+// Trigger restart
+// Second restart

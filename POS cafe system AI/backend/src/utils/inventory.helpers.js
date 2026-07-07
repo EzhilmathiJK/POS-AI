@@ -22,10 +22,14 @@ export const generateItemNumber = async () => {
     return `ITM-${String(nextNumber).padStart(6, "0")}`;
 };
 
-export const calculateStock = (stock) => {
+export const calculateStock = async (stock) => {
     if (stock <= 0) {
         return "Out of Stock";
-    } else if (stock <= 10) {
+    }
+    const settings = await prisma.generalSettings.findFirst();
+    const threshold = settings?.low_stock_threshold ?? 10;
+    
+    if (stock <= threshold) {
         return "Low Stock";
     } else {
         return "In Stock";

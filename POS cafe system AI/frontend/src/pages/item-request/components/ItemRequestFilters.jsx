@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Icons } from '../../../assets/icons';
 import api from '../../../api/axios';
+import { useAppContext } from '../../../context/AppContext';
 
 const SelectField = ({ label, placeholder, options, value, onChange }) => (
   <div className="flex flex-col gap-[7px] w-full">
@@ -54,6 +55,7 @@ const DateField = ({ label, value, onChange }) => (
 );
 
 const ItemRequestFilters = ({ onFilter }) => {
+  const { showToast } = useAppContext();
   const [requestNumbers, setRequestNumbers] = useState([]);
   const [requestedBy, setRequestedBy] = useState([]);
 
@@ -61,7 +63,6 @@ const ItemRequestFilters = ({ onFilter }) => {
     requestNo: 'all',
     subject: '',
     requestedBy: 'all',
-    status: 'all',
     dateFrom: '',
     dateTo: ''
   });
@@ -86,22 +87,29 @@ const ItemRequestFilters = ({ onFilter }) => {
   };
 
   const handleFilter = () => {
+    if (filters.dateFrom && !filters.dateTo) {
+      showToast('Please select a Requested Date To', 'warning');
+      return;
+    }
+    if (!filters.dateFrom && filters.dateTo) {
+      showToast('Please select a Requested Date From', 'warning');
+      return;
+    }
     if (onFilter) onFilter(filters);
   };
 
   const handleReset = () => {
-    const defaultFilters = { requestNo: 'all', subject: '', requestedBy: 'all', status: 'all', dateFrom: '', dateTo: '' };
+    const defaultFilters = { requestNo: 'all', subject: '', requestedBy: 'all', dateFrom: '', dateTo: '' };
     setFilters(defaultFilters);
     if (onFilter) onFilter(defaultFilters);
   };
 
   return (
     <div className="w-full bg-white rounded-[6px] border border-[var(--color-border)] shadow-[0_1px_2px_rgba(3,4,90,0.04)] px-[16px] py-[16px] box-border shrink-0">
-      <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-[minmax(150px,1fr)_minmax(150px,1fr)_minmax(140px,1fr)_minmax(150px,1fr)_minmax(150px,1fr)_minmax(150px,1fr)_minmax(190px,auto)] gap-[14px] items-end min-w-0">
+      <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-[minmax(150px,1fr)_minmax(150px,1fr)_minmax(140px,1fr)_minmax(150px,1fr)_minmax(150px,1fr)_minmax(190px,auto)] gap-[14px] items-end min-w-0">
         <SelectField label="Request ID" placeholder="All Requests" options={requestNumbers} value={filters.requestNo} onChange={(e) => handleChange('requestNo', e.target.value)} />
         <TextField label="Subject" placeholder="Enter subject" value={filters.subject} onChange={(e) => handleChange('subject', e.target.value)} />
         <SelectField label="Requested By" placeholder="All Users" options={requestedBy} value={filters.requestedBy} onChange={(e) => handleChange('requestedBy', e.target.value)} />
-        <SelectField label="Status" placeholder="All Status" options={['Pending', 'On The Way', 'Received', 'Cancelled']} value={filters.status} onChange={(e) => handleChange('status', e.target.value)} />
         <DateField label="Requested Date From" value={filters.dateFrom} onChange={(e) => handleChange('dateFrom', e.target.value)} />
         <DateField label="Requested Date To" value={filters.dateTo} onChange={(e) => handleChange('dateTo', e.target.value)} />
 

@@ -9,7 +9,7 @@ const SortMark = () => (
 );
 
 
-const UsersTable = ({ users, onEditUser, onAddUser }) => {
+const UsersTable = ({ users, loading, pagination, onPageChange, onLimitChange, onEditUser, onAddUser }) => {
   return (
     <section className="w-full flex-1 min-h-[520px] lg:min-h-0 flex flex-col bg-white rounded-[6px] border border-[var(--color-border)] shadow-[0_1px_2px_rgba(3,4,90,0.04)] mt-[14px] overflow-hidden min-w-0 shrink-0">
       
@@ -88,8 +88,10 @@ const UsersTable = ({ users, onEditUser, onAddUser }) => {
       </div>
 
       <Pagination 
-        pagination={{ page: 1, totalPages: 1, totalRecords: users.length, limit: 10 }}
+        pagination={pagination}
         itemName="entries"
+        onPageChange={onPageChange}
+        onLimitChange={onLimitChange}
       />
     </section>
   );

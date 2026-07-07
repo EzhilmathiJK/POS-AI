@@ -2,8 +2,9 @@ import bcrypt from 'bcrypt';
 import * as usersRepo from './users.repository.js';
 import * as authRepo from '../auth/auth.repository.js'; // reuse for duplicate check & create
 
-export const fetchAllUsers = async () => {
-  return await usersRepo.getAllUsers();
+export const fetchAllUsers = async (page = 1, limit = 10, filters = {}) => {
+  const offset = (page - 1) * limit;
+  return await usersRepo.getAllUsers(offset, limit, filters);
 };
 
 export const createNewUser = async (userData) => {

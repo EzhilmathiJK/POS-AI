@@ -8,7 +8,7 @@ const FieldLabel = ({ children }) => (
 );
 
 const InventorySettings = () => {
-  const { settings, setSettings } = useAppContext();
+  const { settings, setSettings, showToast } = useAppContext();
   
   const [formData, setFormData] = useState({
     gst: '',
@@ -17,8 +17,8 @@ const InventorySettings = () => {
 
   useEffect(() => {
     setFormData({
-      gst: settings.gst,
-      lowStockThreshold: settings.lowStockThreshold,
+      gst: settings.gst !== undefined ? settings.gst : '',
+      lowStockThreshold: settings.lowStockThreshold !== undefined ? settings.lowStockThreshold : '',
     });
   }, [settings]);
 
@@ -26,12 +26,28 @@ const InventorySettings = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSave = () => {
-    setSettings(prev => ({ 
-      ...prev, 
-      gst: formData.gst !== '' ? Number(formData.gst) : prev.gst,
-      lowStockThreshold: formData.lowStockThreshold !== '' ? Number(formData.lowStockThreshold) : prev.lowStockThreshold
-    }));
+  const handleSave = async () => {
+    try {
+      const payload = {
+        gst_percentage: Number(formData.gst),
+        low_stock_threshold: Number(formData.lowStockThreshold)
+      };
+
+      const { default: api } = await import('../../../api/axios');
+      const res = await api.put('/settings/inventory', payload);
+
+      if (res.data.success) {
+        setSettings(prev => ({
+          ...prev,
+          gst: payload.gst_percentage,
+          lowStockThreshold: payload.low_stock_threshold
+        }));
+        showToast('Inventory settings saved successfully');
+      }
+    } catch (error) {
+      console.error('Failed to save inventory settings:', error);
+      showToast(error.response?.data?.message || 'Failed to save settings', 'error');
+    }
   };
 
   return (

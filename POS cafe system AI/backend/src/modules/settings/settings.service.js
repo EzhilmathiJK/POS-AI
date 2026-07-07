@@ -6,7 +6,7 @@ export const fetchAllRolePermissions = async () => {
 
 export const editRolePermission = async (role, data) => {
   // Ensure the role is valid
-  const validRoles = ['ADMIN', 'MANAGER', 'STAFF', 'CASHIER'];
+  const validRoles = ['Admin', 'Manager', 'Staff', 'Cashier'];
   if (!validRoles.includes(role)) {
     const error = new Error('Invalid role');
     error.statusCode = 400;
@@ -26,4 +26,12 @@ export const createCategory = async (data) => {
 
 export const deleteCategory = async (id) => {
   return await settingsRepo.deleteCategory(id);
+};
+
+export const fetchGeneralSettings = async () => {
+  return await settingsRepo.getGeneralSettings();
+};
+
+export const editGeneralSettings = async (data) => {
+  return await settingsRepo.updateGeneralSettings(data);
 };

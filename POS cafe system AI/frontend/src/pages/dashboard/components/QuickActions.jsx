@@ -1,12 +1,15 @@
 import { Icons } from '../../../assets/icons';
+import { useNavigate } from 'react-router-dom';
 
 const QuickActions = () => {
+  const navigate = useNavigate();
+
   const actions = [
-    { name: 'New Bill', icon: Icons.ItemRequest, color: '#f3e8fd', iconColor: 'var(--color-primary)' },
-    { name: 'Add Product', icon: Icons.Inventory, color: '#e6f4ea', iconColor: '#00a711' },
-    { name: 'New Order', icon: Icons.Lock, color: '#fdf0e6', iconColor: '#f58025' },
-    { name: 'Add Customer', icon: Icons.Users, color: '#e8f0fe', iconColor: '#1a73e8' },
-    { name: 'Reports', icon: Icons.SalesReport, color: '#f3e8fd', iconColor: 'var(--color-primary)' },
+    { name: 'New Bill', icon: Icons.ItemRequest, color: '#f3e8fd', iconColor: 'var(--color-primary)', path: '/billing' },
+    { name: 'Add Product', icon: Icons.Inventory, color: '#e6f4ea', iconColor: '#00a711', path: '/inventory?action=add' },
+    { name: 'New Order', icon: Icons.Lock, color: '#fdf0e6', iconColor: '#f58025', path: '/billing' },
+    { name: 'Add Customer', icon: Icons.Users, color: '#e8f0fe', iconColor: '#1a73e8', path: '/users' },
+    { name: 'Reports', icon: Icons.SalesReport, color: '#f3e8fd', iconColor: 'var(--color-primary)', path: '/sales-report' },
   ];
 
   return (
@@ -17,6 +20,7 @@ const QuickActions = () => {
         {actions.map((action, index) => (
           <button 
             key={index}
+            onClick={() => navigate(action.path)}
             className="flex flex-col items-center justify-center gap-[6px] h-full rounded-[6px] border border-[#deddf6] hover:bg-gray-50 transition-colors p-[4px] min-w-0"
           >
             <div 

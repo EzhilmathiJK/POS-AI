@@ -35,3 +35,28 @@ export const uploadInventoryImage = multer({
     fileSize: 2 * 1024 * 1024 // 2MB limit
   }
 });
+
+// Ensure settings upload directory exists
+const settingsUploadDir = path.join(process.cwd(), 'uploads', 'settings');
+if (!fs.existsSync(settingsUploadDir)) {
+  fs.mkdirSync(settingsUploadDir, { recursive: true });
+}
+
+// Multer config for settings
+const settingsStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, settingsUploadDir);
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+export const uploadSettingsLogo = multer({
+  storage: settingsStorage,
+  fileFilter: fileFilter,
+  limits: {
+    fileSize: 2 * 1024 * 1024 // 2MB limit
+  }
+});

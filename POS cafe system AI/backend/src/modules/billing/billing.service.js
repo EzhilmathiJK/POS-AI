@@ -1,19 +1,14 @@
 import prisma from '../../config/prisma.js';
 import * as billingRepo from './billing.repository.js';
 import { calculateStock } from '../../utils/inventory.helpers.js';
+import { generateBillNumber } from '../../utils/billing.helper.js';
 
-const generateBillNumber = async () => {
-  const lastBill = await billingRepo.getLatestBill();
-  if (!lastBill) {
-    return 'BILL-000001';
-  }
-  const lastNumber = parseInt(lastBill.bill_number.split('-')[1], 10);
-  return `BILL-${String(lastNumber + 1).padStart(6, '0')}`;
-};
+
 
 export const createBill = async (billData) => {
   const { cart, totalAmount, tenderAmount, balanceAmount } = billData;
-  const billNumber = await generateBillNumber();
+  const lastBill = await billingRepo.getLatestBill();
+  const billNumber = generateBillNumber(lastBill);
 
   // Execute in a transaction to ensure data integrity
   const result = await prisma.$transaction(async (tx) => {
@@ -54,7 +49,7 @@ export const createBill = async (billData) => {
 
       const newSold = inventory.sold + item.quantity;
       const newInStock = inventory.in_stock - item.quantity;
-      const newStatus = calculateStock(newInStock);
+      const newStatus = await calculateStock(newInStock);
 
       await tx.inventory.update({
         where: { id: inventory.id },

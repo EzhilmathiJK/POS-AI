@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Icons } from '../../assets/icons';
 import { useAppContext } from '../../context/AppContext';
 import UserFilters from './components/UserFilters';
@@ -7,7 +7,7 @@ import UserFormModal from './components/UserFormModal';
 import api from '../../api/axios';
 
 const UsersTopBar = () => {
-  const { toggleSidebar } = useAppContext();
+  const { settings, toggleSidebar } = useAppContext();
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
@@ -37,7 +37,7 @@ const UsersTopBar = () => {
         <div className="h-full flex items-center gap-[9px] pl-[15px] pr-[17px]">
           <Icons.Clock className="text-[17px] text-[var(--color-primary)]" />
           <span className="text-[12px] font-semibold">
-            {time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+            {time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: settings?.timeFormat === '12h' })}
           </span>
         </div>
       </div>
@@ -45,7 +45,7 @@ const UsersTopBar = () => {
   );
 };
 
-const formatApiUser = (user) => ({
+const formatApiUser = (user, settings) => ({
   id: user.id,
   fullName: user.full_name,
   username: user.username,
@@ -55,64 +55,75 @@ const formatApiUser = (user) => ({
   createdAt: new Date(user.created_at).toLocaleDateString('en-GB', {
     day: '2-digit', month: 'short', year: 'numeric'
   }) + ' ' + new Date(user.created_at).toLocaleTimeString('en-US', {
-    hour: '2-digit', minute: '2-digit', hour12: true
+    hour: '2-digit', minute: '2-digit', hour12: settings?.timeFormat === '12h'
   }).toUpperCase(),
 });
 
 const UsersLayout = () => {
+  const { settings } = useAppContext();
   const [users, setUsers] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [loading, setLoading] = useState(false);
+  
+  const [pagination, setPagination] = useState({ page: 1, limit: 10, totalPages: 1, totalRecords: 0 });
+  const [filterValues, setFilterValues] = useState({ search: '', role: 'All Roles', status: 'All Status' });
+  const [appliedFilters, setAppliedFilters] = useState({ search: '', role: 'All Roles', status: 'All Status' });
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async (currentFilters = appliedFilters, page = pagination.page) => {
     try {
-      const response = await api.get('/users');
+      setLoading(true);
+      const queryParams = new URLSearchParams({
+        page,
+        limit: pagination.limit,
+        ...currentFilters
+      });
+
+      const response = await api.get(`/users?${queryParams}`);
       if (response.data.success) {
-        const mappedUsers = response.data.data.users.map(formatApiUser);
+        const mappedUsers = response.data.data.users.map(u => formatApiUser(u, settings));
         setUsers(mappedUsers);
+        setPagination(prev => ({
+          ...prev,
+          totalRecords: response.data.data.totalRecords,
+          totalPages: Math.ceil(response.data.data.totalRecords / prev.limit) || 1,
+          page
+        }));
       }
     } catch (error) {
       console.error("Failed to fetch users", error);
+    } finally {
+      setLoading(false);
     }
-  };
+  }, [appliedFilters, pagination.page, pagination.limit, settings]);
 
   useEffect(() => {
     fetchUsers();
-  }, []);
-
-  const [filterValues, setFilterValues] = useState({
-    search: '',
-    role: 'All Roles',
-    status: 'All Status',
-  });
+  }, [fetchUsers]);
 
   const handleFilterChange = (key, value) => {
     setFilterValues(prev => ({ ...prev, [key]: value }));
   };
 
-  const handleResetFilters = () => {
-    setFilterValues({
-      search: '',
-      role: 'All Roles',
-      status: 'All Status',
-    });
+  const handleApplyFilters = () => {
+    setAppliedFilters(filterValues);
+    fetchUsers(filterValues, 1);
   };
 
-  const filteredUsers = useMemo(() => {
-    return users.filter(user => {
-      const searchLower = filterValues.search.toLowerCase();
-      const matchesSearch = 
-        user.fullName.toLowerCase().includes(searchLower) || 
-        user.email.toLowerCase().includes(searchLower);
+  const handleResetFilters = () => {
+    const defaultFilters = { search: '', role: 'All Roles', status: 'All Status' };
+    setFilterValues(defaultFilters);
+    setAppliedFilters(defaultFilters);
+    fetchUsers(defaultFilters, 1);
+  };
 
-      // We compare case insensitively because API role is STAFF, filter is Staff
-      const matchesRole = filterValues.role === 'All Roles' || user.role.toLowerCase() === filterValues.role.toLowerCase();
-      const matchesStatus = filterValues.status === 'All Status' || user.status === filterValues.status;
+  const handlePageChange = (newPage) => {
+    fetchUsers(appliedFilters, newPage);
+  };
 
-      return matchesSearch && matchesRole && matchesStatus;
-    });
-  }, [users, filterValues]);
+  const handleLimitChange = (newLimit) => {
+    setPagination(prev => ({ ...prev, limit: newLimit, page: 1 }));
+  };
 
   const handleAddClick = () => {
     setEditingUser(null);
@@ -161,7 +172,6 @@ const UsersLayout = () => {
   };
 
   const handleDeleteUser = (id) => {
-    // DELETE /api/users/:id implementation left out for now
     setUsers(prev => prev.filter(u => u.id !== id));
   };
 
@@ -172,11 +182,16 @@ const UsersLayout = () => {
       <UserFilters 
         filterValues={filterValues} 
         onFilterChange={handleFilterChange} 
+        onFilterClick={handleApplyFilters}
         onReset={handleResetFilters} 
       />
       
       <UsersTable 
-        users={filteredUsers} 
+        users={users} 
+        loading={loading}
+        pagination={pagination}
+        onPageChange={handlePageChange}
+        onLimitChange={handleLimitChange}
         onEditUser={handleEditClick} 
         onAddUser={handleAddClick} 
       />

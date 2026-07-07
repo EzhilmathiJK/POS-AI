@@ -1,7 +1,7 @@
 import React from 'react';
 import { Icons } from '../../../assets/icons';
 
-const UserFilters = ({ filterValues, onFilterChange, onReset }) => {
+const UserFilters = ({ filterValues, onFilterChange, onFilterClick, onReset }) => {
   return (
     <div className="w-full bg-white rounded-[6px] border border-[var(--color-border)] shadow-[0_1px_2px_rgba(3,4,90,0.04)] px-[20px] py-[20px] box-border shrink-0 min-h-[82px] transition-all duration-200 mt-[12px]">
       <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1fr_minmax(150px,200px)_minmax(150px,200px)_auto] gap-[20px] lg:gap-[32px] items-end min-w-0">
@@ -59,6 +59,7 @@ const UserFilters = ({ filterValues, onFilterChange, onReset }) => {
 
         <div className="grid grid-cols-2 gap-[12px] w-full min-w-0 lg:ml-auto">
           <button 
+            onClick={onFilterClick}
             style={{ fontSize: '14px' }} 
             className="h-[42px] rounded-[6px] bg-[var(--color-primary)] text-white flex items-center justify-center gap-[8px] font-bold hover:bg-[var(--color-primary-hover)] shrink-0 cursor-pointer whitespace-nowrap px-[12px]"
           >

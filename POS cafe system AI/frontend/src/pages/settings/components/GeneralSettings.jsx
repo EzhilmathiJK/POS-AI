@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Icons } from '../../../assets/icons';
 import { useAppContext } from '../../../context/AppContext';
+import api from '../../../api/axios';
 
 const FieldLabel = ({ children }) => (
   <span className="block text-[13px] leading-[16px] font-semibold text-[var(--color-text)] mb-[9px]">
@@ -9,26 +10,69 @@ const FieldLabel = ({ children }) => (
 );
 
 const GeneralSettings = () => {
-  const { settings, setSettings } = useAppContext();
+  const { settings, setSettings, showToast } = useAppContext();
   
   const [formData, setFormData] = useState({
     cafeName: '',
     timeFormat: '',
   });
+  
+  const [logoFile, setLogoFile] = useState(null);
+  const [previewLogo, setPreviewLogo] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     setFormData({
-      cafeName: settings.cafeName,
-      timeFormat: settings.timeFormat,
+      cafeName: settings.cafeName || '',
+      timeFormat: settings.timeFormat || '12h',
     });
+    setPreviewLogo(settings.logo || '/logo.png');
   }, [settings]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSave = () => {
-    setSettings(prev => ({ ...prev, ...formData }));
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setLogoFile(file);
+      setPreviewLogo(URL.createObjectURL(file));
+    }
+  };
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      const data = new FormData();
+      data.append('cafe_name', formData.cafeName);
+      data.append('time_format', formData.timeFormat);
+      if (logoFile) {
+        data.append('cafe_logo', logoFile);
+      }
+
+      const res = await api.put('/settings/general', data, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+
+      if (res.data.success) {
+        const updated = res.data.data;
+        const newLogo = updated.cafe_logo.startsWith('/uploads') ? `http://localhost:8000${updated.cafe_logo}` : updated.cafe_logo;
+        
+        setSettings(prev => ({
+          ...prev,
+          cafeName: updated.cafe_name,
+          timeFormat: updated.time_format,
+          logo: newLogo
+        }));
+        showToast('Settings saved successfully');
+      }
+    } catch (error) {
+      console.error(error);
+      showToast('Failed to save settings', 'error');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -67,13 +111,14 @@ const GeneralSettings = () => {
       <div>
         <FieldLabel>Cafe Logo</FieldLabel>
         <div className="flex w-full max-w-[400px] h-[115px] rounded-[9px] border border-[#deddf6] overflow-hidden bg-white">
-          <div className="w-[140px] shrink-0 flex items-center justify-center border-r border-[#deddf6]">
-            <img src="/logo.png" alt="Cafe Logo" className="w-[50px] object-contain opacity-50 grayscale" />
+          <div className="w-[140px] shrink-0 flex items-center justify-center border-r border-[#deddf6] bg-[#f7f6ff]">
+            <img src={previewLogo || '/default-image.png'} alt="Cafe Logo" className="w-full h-full object-contain p-[10px]" />
           </div>
           <div className="flex-1 flex flex-col items-center justify-center relative hover:bg-gray-50 cursor-pointer">
             <input
               type="file"
               accept="image/png,image/jpeg,image/webp"
+              onChange={handleFileChange}
               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
             />
             <div className="flex items-center gap-[8px] text-[var(--color-primary)]">
@@ -90,10 +135,11 @@ const GeneralSettings = () => {
       <div>
         <button
           onClick={handleSave}
+          disabled={isSaving}
           style={{ fontSize: '14px' }}
-          className="h-[36px] px-[24px] rounded-[7px] bg-[var(--color-primary)] font-bold text-white flex items-center justify-center hover:bg-[var(--color-primary-hover)]"
+          className="h-[36px] px-[24px] rounded-[7px] bg-[var(--color-primary)] font-bold text-white flex items-center justify-center hover:bg-[var(--color-primary-hover)] disabled:opacity-70 disabled:cursor-not-allowed"
         >
-          Save Changes
+          {isSaving ? 'Saving...' : 'Save Changes'}
         </button>
       </div>
     </div>

@@ -1,6 +1,8 @@
 import { Icons } from '../../assets/icons';
+import { useAppContext } from '../../context/AppContext';
 
 const PriceAmendment = ({ totalAmount, gstAmount, payable, tenderAmount = 0, onTenderChange }) => {
+  const { settings } = useAppContext();
   const formatAmount = (amount) => `₹${amount.toFixed(2)}`;
 
   const change = tenderAmount > payable ? tenderAmount - payable : 0;
@@ -19,7 +21,7 @@ const PriceAmendment = ({ totalAmount, gstAmount, payable, tenderAmount = 0, onT
             <span className="text-black">{formatAmount(totalAmount)}</span>
           </div>
           <div className="flex items-center justify-between text-[12px] leading-[15px] font-semibold">
-            <span className="text-[var(--color-text)]">GST Amount (7%):</span>
+            <span className="text-[var(--color-text)]">GST Amount ({settings?.gst ?? 7}%):</span>
             <span className="text-black">{formatAmount(gstAmount)}</span>
           </div>
         </div>

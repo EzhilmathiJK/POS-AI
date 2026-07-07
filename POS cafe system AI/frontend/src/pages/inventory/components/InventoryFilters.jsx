@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Icons } from '../../../assets/icons';
 import api from '../../../api/axios';
+import { useAppContext } from '../../../context/AppContext';
 
 const SelectField = ({ label, icon: Icon, value, options, selected, onChange }) => (
   <div className="flex flex-col gap-[7px] w-full">
@@ -41,6 +42,7 @@ const DateField = ({ label, value, onChange }) => (
 );
 
 const InventoryFilters = ({ onFilter }) => {
+  const { showToast } = useAppContext();
   const [filterOptions, setFilterOptions] = useState({ categories: [], itemNames: [], statuses: [] });
   const [filters, setFilters] = useState({
     category: 'all',
@@ -69,6 +71,14 @@ const InventoryFilters = ({ onFilter }) => {
   };
 
   const handleFilterClick = () => {
+    if (filters.dateFrom && !filters.dateTo) {
+      showToast('Please select a Date To', 'warning');
+      return;
+    }
+    if (!filters.dateFrom && filters.dateTo) {
+      showToast('Please select a Date From', 'warning');
+      return;
+    }
     if (onFilter) {
       onFilter(filters);
     }

@@ -30,7 +30,12 @@ const CurrentBill = ({ items = [], onRemoveItem }) => {
               >
                 <div className="flex items-center gap-[12px] min-w-0">
                   <div className="w-[32px] h-[32px] rounded-[5px] bg-[#f6f7fb] flex items-center justify-center shrink-0 overflow-hidden">
-                    <img src={getImageUrl(item.image_url)} alt={item.item_name} className="max-w-[26px] max-h-[27px] object-contain" />
+                    <img 
+                      src={getImageUrl(item.image_url)} 
+                      alt={item.item_name} 
+                      className="w-[26px] h-[26px] object-contain" 
+                      onError={(e) => { e.target.src = '/menu/default.png'; }}
+                    />
                   </div>
                   <span className="font-semibold text-[12px] text-[var(--color-text)] truncate">{item.item_name}</span>
                 </div>

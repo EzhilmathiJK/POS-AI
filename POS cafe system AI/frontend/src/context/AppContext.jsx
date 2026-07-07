@@ -5,35 +5,17 @@ import { Icons } from '../assets/icons';
 const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
-  // General & Inventory Settings
+  // General Settings
   const [settings, setSettings] = useState({
-    cafeName: 'Coffee Cove',
+    cafeName: 'POS Cafe',
     timeFormat: '12h',
-    logo: '/logo.png',
+    logo: '/default-image.png',
     gst: 7,
     lowStockThreshold: 10,
   });
 
   // Menu Categories
   const [categories, setCategories] = useState([]);
-
-  // Fetch categories on mount
-  useEffect(() => {
-    import('../api/axios').then(({ default: api }) => {
-      api.get('/settings/categories')
-        .then(res => {
-          if (res.data.success) {
-            // Map iconName correctly and ensure ids are strings for frontend consistency
-            const fetchedCats = res.data.data.map(c => ({
-              ...c,
-              id: c.id.toString()
-            }));
-            setCategories(fetchedCats);
-          }
-        })
-        .catch(err => console.error("Failed to load categories:", err));
-    });
-  }, []);
 
   // Allowed pages for current user
   const [currentPermissions, setCurrentPermissions] = useState(() => {
@@ -46,6 +28,46 @@ export const AppProvider = ({ children }) => {
     const stored = localStorage.getItem('user');
     return stored ? JSON.parse(stored) : null;
   });
+
+  // Fetch settings & categories on mount or login
+  useEffect(() => {
+    import('../api/axios').then(({ default: api }) => {
+      // Fetch General Settings (Public)
+      api.get('/settings/general')
+        .then(res => {
+          if (res.data.success && res.data.data) {
+            const data = res.data.data;
+            setSettings(prev => ({
+              ...prev,
+              cafeName: data.cafe_name,
+              logo: data.cafe_logo.startsWith('/uploads') ? `http://localhost:8000${data.cafe_logo}` : data.cafe_logo,
+              timeFormat: data.time_format,
+              gst: data.gst_percentage !== undefined ? Number(data.gst_percentage) : 7,
+              lowStockThreshold: data.low_stock_threshold !== undefined ? data.low_stock_threshold : 10
+            }));
+          }
+        })
+        .catch(err => console.error("Failed to load general settings:", err));
+
+      // Fetch Categories (Protected)
+      if (currentUser) {
+        api.get('/settings/categories')
+          .then(res => {
+            if (res.data.success) {
+              const fetchedCats = res.data.data.map(c => ({
+                ...c,
+                id: c.id.toString()
+              }));
+              setCategories(fetchedCats);
+            }
+          })
+          .catch(err => console.error("Failed to load categories:", err));
+      } else {
+        setCategories([]);
+      }
+    });
+  }, [currentUser]);
+
 
   // Global Toast State
   const [toast, setToast] = useState(null); // Keep state for backward compatibility if any component reads it directly, though we should just use react-toastify
@@ -70,7 +92,7 @@ export const AppProvider = ({ children }) => {
   const [unauthorizedState, setUnauthorizedState] = useState({ isOpen: false, type: null });
   const triggerUnauthorized = useCallback((type) => setUnauthorizedState({ isOpen: true, type }), []);
 
-  // Auto-trigger Unauthorized when token expires
+  // Proactively refresh token 30 seconds before expiration
   useEffect(() => {
     let timeoutId;
     
@@ -88,18 +110,40 @@ export const AppProvider = ({ children }) => {
         const decoded = JSON.parse(jsonPayload);
         const exp = decoded.exp * 1000;
         const now = Date.now();
-        // Trigger a ping 1 second AFTER expiration to force the interceptor's 401 seamless refresh logic
-        const timeUntilExpiry = (exp - now) + 1000;
         
-        if (timeUntilExpiry <= 0) {
-          import('../api/axios').then(({ default: api }) => api.get('/auth/me').catch(() => {}));
+        // Trigger refresh 30 seconds before expiration
+        const timeUntilRefresh = (exp - now) - 30000;
+        
+        if (timeUntilRefresh <= 0) {
+          doRefreshToken();
         } else {
           timeoutId = setTimeout(() => {
-            import('../api/axios').then(({ default: api }) => api.get('/auth/me').catch(() => {}));
-          }, timeUntilExpiry);
+            doRefreshToken();
+          }, timeUntilRefresh);
         }
       } catch (error) {
         console.error("Error parsing token", error);
+      }
+    };
+
+    const doRefreshToken = async () => {
+      try {
+        const refreshToken = localStorage.getItem('refreshToken');
+        if (!refreshToken) return;
+        
+        const response = await fetch('http://localhost:8000/api/auth/refresh-token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token: refreshToken })
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+          localStorage.setItem('accessToken', data.data.accessToken);
+          window.dispatchEvent(new CustomEvent('token_refreshed'));
+        }
+      } catch (error) {
+        console.error("Proactive token refresh failed", error);
       }
     };
 
@@ -115,7 +159,7 @@ export const AppProvider = ({ children }) => {
       clearTimeout(timeoutId);
       window.removeEventListener('token_refreshed', handleTokenRefreshed);
     };
-  }, [currentUser, triggerUnauthorized]);
+  }, [currentUser]);
 
   return (
     <AppContext.Provider value={{

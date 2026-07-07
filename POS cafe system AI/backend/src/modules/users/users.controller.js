@@ -2,11 +2,21 @@ import * as usersService from './users.service.js';
 
 export const getUsers = async (req, res, next) => {
   try {
-    const users = await usersService.fetchAllUsers();
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    
+    const filters = {
+      search: req.query.search || '',
+      role: req.query.role || 'All Roles',
+      status: req.query.status || 'All Status',
+    };
+
+    const data = await usersService.fetchAllUsers(page, limit, filters);
+    
     res.status(200).json({
       success: true,
       message: 'Users fetched successfully',
-      data: { users },
+      data,
     });
   } catch (error) {
     next(error);

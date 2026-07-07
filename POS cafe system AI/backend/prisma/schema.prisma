@@ -140,3 +140,16 @@ model Category {
 
   @@map("categories")
 }
+
+model GeneralSettings {
+  id          Int      @id @default(autoincrement())
+  cafe_name   String   @default("POS Cafe")
+  cafe_logo   String   @default("/logo.png")
+  time_format         String   @default("12h")
+  gst_percentage      Decimal  @db.Decimal(5, 2) @default(7.00)
+  low_stock_threshold Int      @default(10)
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
+
+  @@map("general_settings")
+}
