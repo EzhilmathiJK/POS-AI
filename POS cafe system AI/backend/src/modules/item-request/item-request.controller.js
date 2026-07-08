@@ -2,7 +2,7 @@ import * as ItemRequestService from './item-request.service.js';
 
 export const createItemRequest = async (req, res, next) => {
   try {
-    const result = await ItemRequestService.createItemRequest(req.body, req.user.full_name);
+    const result = await ItemRequestService.createItemRequest(req.body, req.user.fullname);
     res.status(201).json({ success: true, message: 'Request created successfully.', data: result });
   } catch (error) {
     next(error);

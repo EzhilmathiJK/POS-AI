@@ -158,7 +158,7 @@ const NewItemRequestForm = ({ mode = 'add', initialData = null, onCancel, onUpda
 
   const getPayload = () => ({
     subject: formData.subject,
-    requestedBy: currentUser?.full_name || 'Admin',
+    requestedBy: currentUser?.fullname || 'Admin',
     deliveryDate: formData.expectingDelivery,
     items: rows.map(r => ({
       inventoryId: parseInt(r.item),

@@ -3,30 +3,27 @@ import cors from 'cors';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import errorHandler from './middleware/errorHandler.js';
+import passport from './config/passport.js';
 
 const app = express();
 
-// 1. Security & Standard Middlewares
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(passport.initialize());
 
-// 1.5 Global JSON Replacer (Strip Metadata)
 app.set('json replacer', (key, value) => {
-  if (['is_deleted', 'created_at', 'updated_at'].includes(key)) {
-    return undefined; // Strips these fields from all responses automatically
+  if (key === 'is_deleted') {
+    return undefined; 
   }
   return value;
 });
 
-// 2. Logging
 app.use(morgan('dev'));
 
-// Serve uploads folder
 import path from 'path';
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
-// 3. Rate Limiting (Basic Protection)
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 2000, // Limit each IP to 2000 requests per `window` (here, per 15 minutes)
@@ -66,8 +63,3 @@ app.use((req, res, next) => {
 app.use(errorHandler);
 
 export default app;
-
-// Trigger restart
-// Second restart
-// Third restart for prisma client
-// Fourth restart for route auth fix

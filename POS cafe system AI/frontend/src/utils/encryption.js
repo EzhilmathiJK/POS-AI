@@ -14,5 +14,5 @@ export const encrypt = (text) => {
     }
   );
 
-  return encrypted.toString();
+  return iv.toString(CryptoJS.enc.Hex) + ':' + encrypted.toString();
 };

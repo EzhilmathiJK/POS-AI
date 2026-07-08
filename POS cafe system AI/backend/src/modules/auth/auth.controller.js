@@ -124,3 +124,15 @@ export const getMe = async (req, res, next) => {
     next(error);
   }
 };
+
+export const googleCallback = async (req, res, next) => {
+  try {
+    const authData = await authService.loginWithGoogle(req.user);
+    
+    const frontendUrl = `http://localhost:5174/login?accessToken=${authData.accessToken}&refreshToken=${authData.refreshToken}`;
+    res.redirect(frontendUrl);
+  } catch (error) {
+    const frontendUrl = `http://localhost:5174/login?error=${encodeURIComponent(error.message)}`;
+    res.redirect(frontendUrl);  
+  }
+}

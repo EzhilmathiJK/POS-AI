@@ -45,7 +45,12 @@ export const updateRolePermission = async (req, res, next) => {
 export const getCategories = async (req, res, next) => {
   try {
     const categories = await settingsService.fetchAllCategories();
-    res.status(200).json({ success: true, data: categories });
+    const mappedCategories = categories.map(c => ({
+      id: c.id,
+      name: c.name,
+      iconName: c.iconName
+    }));
+    res.status(200).json({ success: true, data: mappedCategories });
   } catch (error) {
     next(error);
   }
@@ -58,7 +63,14 @@ export const createCategory = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'Name and iconName are required' });
     }
     const category = await settingsService.createCategory({ name, iconName });
-    res.status(201).json({ success: true, data: category });
+    res.status(201).json({ 
+      success: true, 
+      data: {
+        id: category.id,
+        name: category.name,
+        iconName: category.iconName
+      }
+    });
   } catch (error) {
     if (error.code === 'P2002') {
       return res.status(400).json({ success: false, message: 'Category already exists' });
