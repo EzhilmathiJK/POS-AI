@@ -1,14 +1,14 @@
 import CryptoJS from 'crypto-js';
 
 const KEY = CryptoJS.enc.Utf8.parse(import.meta.env.VITE_AES_KEY);
-const IV = CryptoJS.enc.Utf8.parse(import.meta.env.VITE_AES_IV);
 
 export const encrypt = (text) => {
+   const iv = CryptoJS.lib.WordArray.random(16);
   const encrypted = CryptoJS.AES.encrypt(
     text,
     KEY,
     {
-      iv: IV,
+      iv: iv,
       mode: CryptoJS.mode.CBC,
       padding: CryptoJS.pad.Pkcs7,
     }

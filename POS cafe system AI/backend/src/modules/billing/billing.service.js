@@ -9,10 +9,8 @@ export const createBill = async (billData) => {
   const { cart, totalAmount, tenderAmount, balanceAmount } = billData;
   const lastBill = await billingRepo.getLatestBill();
   const billNumber = generateBillNumber(lastBill);
-
-  // Execute in a transaction to ensure data integrity
   const result = await prisma.$transaction(async (tx) => {
-    // 1. Create the Bill
+    
     const newBill = await tx.bill.create({
       data: {
         bill_number: billNumber,
@@ -22,11 +20,10 @@ export const createBill = async (billData) => {
       }
     });
 
-    // 2. Create BillItems
     const billItemsData = cart.map((item) => ({
       bill_id: newBill.id,
       inventory_id: item.id,
-      item_number: item.item_number, // or item.code depending on frontend, mapped carefully
+      item_number: item.item_number, 
       item_name: item.item_name,
       quantity: item.quantity,
       unit_price: item.price,

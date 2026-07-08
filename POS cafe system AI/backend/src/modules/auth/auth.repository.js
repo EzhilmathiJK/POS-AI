@@ -20,18 +20,15 @@ export const findUserById = async (id) => {
 };
 
 export const createUser = async (userData) => {
-  // We use a transaction to ensure if user creation succeeds, their default role permissions are also initialized
   return await prisma.$transaction(async (tx) => {
     const user = await tx.user.create({
       data: userData,
     });
 
-    // Check if the role permissions already exist for this role
     const existingPermissions = await tx.rolePermission.findUnique({
       where: { role: user.role },
     });
 
-    // If not, seed the default permissions for this role
     if (!existingPermissions && DEFAULT_ROLE_PERMISSIONS[user.role]) {
       await tx.rolePermission.create({
         data: {

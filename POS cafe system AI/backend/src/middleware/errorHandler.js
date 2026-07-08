@@ -2,7 +2,6 @@
  * Centralized Error Handling Middleware
  */
 const errorHandler = (err, req, res, next) => {
-  // Console log error for internal debugging
   console.error('[Error]:', err);
 
   const statusCode = err.statusCode || 500;

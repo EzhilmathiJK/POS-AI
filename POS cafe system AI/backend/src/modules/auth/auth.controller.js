@@ -62,10 +62,6 @@ export const refreshToken = async (req, res, next) => {
     if (!payload) {
       return res.status(401).json({ success: false, message: 'Invalid or expired refresh token', errors: [] });
     }
-
-    // Check if user still exists, is active, and fetch fresh permissions
-    // This is crucial: Access tokens are stateless, but Refresh tokens MUST hit the DB
-    // so we can revoke access or update permissions without forcing a re-login.
     const { user, permissions } = await authService.getUserWithPermissions(payload.userId);
 
     if (!user.is_active || user.is_deleted) {
@@ -104,8 +100,6 @@ export const refreshToken = async (req, res, next) => {
 
 export const logout = async (req, res, next) => {
   try {
-    // For a stateless JWT, logout is handled by the client dropping the token.
-    // If blacklisting is needed, it would be implemented here.
     res.status(200).json({
       success: true,
       message: 'Logged out successfully',
@@ -118,7 +112,6 @@ export const logout = async (req, res, next) => {
 
 export const getMe = async (req, res, next) => {
   try {
-    // req.user is populated by the `authenticate` middleware
     res.status(200).json({
       success: true,
       message: 'User details fetched successfully',

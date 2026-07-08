@@ -37,9 +37,7 @@ export const getGeneralSettings = async () => {
       data: {
         cafe_name: 'POS Cafe',
         cafe_logo: '/default-image.png',
-        time_format: '12h',
-        gst_percentage: 7.00,
-        low_stock_threshold: 10
+        time_format: '12h'
       }
     });
   }
@@ -54,9 +52,22 @@ export const updateGeneralSettings = async (data) => {
   });
 };
 
+export const getInventorySettings = async () => {
+  let settings = await prisma.inventorySettings.findFirst();
+  if (!settings) {
+    settings = await prisma.inventorySettings.create({
+      data: {
+        gst_percentage: 7.00,
+        low_stock_threshold: 10
+      }
+    });
+  }
+  return settings;
+};
+
 export const updateInventorySettings = async (data) => {
-  const settings = await prisma.generalSettings.findFirst();
-  return await prisma.generalSettings.update({
+  const settings = await prisma.inventorySettings.findFirst();
+  return await prisma.inventorySettings.update({
     where: { id: settings.id },
     data
   });

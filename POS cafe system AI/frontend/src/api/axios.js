@@ -40,7 +40,6 @@ const triggerLogout = () => {
   window.dispatchEvent(new CustomEvent('unauthorized', { detail: { type: 'login_required' } }));
 };
 
-// Interceptor to handle 401 Unauthorized and 403 Forbidden
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -48,7 +47,6 @@ api.interceptors.response.use(
 
     if (error.response) {
       if (error.response.status === 401) {
-        // Skip for login or refresh routes
         if (originalRequest.url && (originalRequest.url.includes('/auth/login') || originalRequest.url.includes('/auth/refresh-token'))) {
           return Promise.reject(error);
         }
@@ -83,7 +81,6 @@ api.interceptors.response.use(
                   api.defaults.headers.common['Authorization'] = 'Bearer ' + newAccessToken;
                   originalRequest.headers.Authorization = 'Bearer ' + newAccessToken;
                   
-                  // Dispatch event so AppContext can reset its auto-expire clock
                   window.dispatchEvent(new CustomEvent('token_refreshed'));
 
                   processQueue(null, newAccessToken);

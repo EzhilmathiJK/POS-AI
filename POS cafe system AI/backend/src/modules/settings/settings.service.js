@@ -35,3 +35,11 @@ export const fetchGeneralSettings = async () => {
 export const editGeneralSettings = async (data) => {
   return await settingsRepo.updateGeneralSettings(data);
 };
+
+export const fetchInventorySettings = async () => {
+  return await settingsRepo.getInventorySettings();
+};
+
+export const editInventorySettings = async (data) => {
+  return await settingsRepo.updateInventorySettings(data);
+};

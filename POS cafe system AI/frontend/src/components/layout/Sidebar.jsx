@@ -92,11 +92,11 @@ const Sidebar = () => {
 
         <div className="h-[71px] px-[24px] flex items-center gap-[11px]">
           <div className="w-[37px] h-[37px] rounded-full bg-[var(--color-primary)] flex items-center justify-center text-white font-bold text-[19px] uppercase">
-            {currentUser?.full_name ? currentUser.full_name.charAt(0) : 'A'}
+            {currentUser?.fullname ? currentUser.fullname.charAt(0) : 'A'}
           </div>
           <div>
             <p className="text-[13px] font-extrabold leading-[15px] capitalize">{currentUser?.role?.toLowerCase() || 'Admin'}</p>
-            <p className="text-[12px] text-white leading-[15px]">{currentUser?.full_name || 'Administrator'}</p>
+            <p className="text-[12px] text-white leading-[15px]">{currentUser?.fullname || 'Administrator'}</p>
           </div>
         </div>
       </aside>

@@ -55,15 +55,13 @@ export const AppProvider = ({ children }) => {
               ...prev,
               cafeName: data.cafe_name,
               logo: data.cafe_logo.startsWith('/uploads') ? `http://localhost:8000${data.cafe_logo}` : data.cafe_logo,
-              timeFormat: data.time_format,
-              gst: data.gst_percentage !== undefined ? Number(data.gst_percentage) : 7,
-              lowStockThreshold: data.low_stock_threshold !== undefined ? data.low_stock_threshold : 10
+              timeFormat: data.time_format
             }));
           }
         })
         .catch(err => console.error("Failed to load general settings:", err));
 
-      // Fetch Categories (Protected)
+      // Fetch Categories & Inventory Settings (Protected)
       if (currentUser) {
         api.get('/settings/categories')
           .then(res => {
@@ -76,6 +74,19 @@ export const AppProvider = ({ children }) => {
             }
           })
           .catch(err => console.error("Failed to load categories:", err));
+
+        api.get('/settings/inventory')
+          .then(res => {
+            if (res.data.success && res.data.data) {
+              const data = res.data.data;
+              setSettings(prev => ({
+                ...prev,
+                gst: data.gst_percentage !== undefined ? Number(data.gst_percentage) : 7,
+                lowStockThreshold: data.low_stock_threshold !== undefined ? data.low_stock_threshold : 10
+              }));
+            }
+          })
+          .catch(err => console.error("Failed to load inventory settings:", err));
       } else {
         setCategories([]);
       }

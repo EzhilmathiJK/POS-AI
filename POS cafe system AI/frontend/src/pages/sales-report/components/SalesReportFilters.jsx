@@ -29,6 +29,7 @@ const DateField = ({ label, value, onChange }) => (
     <div className="relative w-full h-[42px] flex items-center">
       <input
         type="date"
+        max={new Date().toISOString().split('T')[0]}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onClick={(event) => event.currentTarget.showPicker?.()}

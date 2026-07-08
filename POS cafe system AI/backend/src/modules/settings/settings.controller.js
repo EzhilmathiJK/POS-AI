@@ -79,7 +79,15 @@ export const deleteCategory = async (req, res, next) => {
 export const getGeneralSettings = async (req, res, next) => {
   try {
     const settings = await settingsService.fetchGeneralSettings();
-    res.status(200).json({ success: true, data: settings });
+    res.status(200).json({ 
+      success: true, 
+      data: {
+        id: settings.id,
+        cafe_name: settings.cafe_name,
+        cafe_logo: settings.cafe_logo,
+        time_format: settings.time_format
+      }
+    });
   } catch (error) {
     next(error);
   }
@@ -96,7 +104,32 @@ export const updateGeneralSettings = async (req, res, next) => {
     }
 
     const settings = await settingsService.editGeneralSettings(updateData);
-    res.status(200).json({ success: true, message: 'General settings updated', data: settings });
+    res.status(200).json({ 
+      success: true, 
+      message: 'General settings updated', 
+      data: {
+        id: settings.id,
+        cafe_name: settings.cafe_name,
+        cafe_logo: settings.cafe_logo,
+        time_format: settings.time_format
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getInventorySettings = async (req, res, next) => {
+  try {
+    const settings = await settingsService.fetchInventorySettings();
+    res.status(200).json({ 
+      success: true, 
+      data: {
+        id: settings.id,
+        gst_percentage: settings.gst_percentage,
+        low_stock_threshold: settings.low_stock_threshold
+      }
+    });
   } catch (error) {
     next(error);
   }
@@ -110,7 +143,7 @@ export const updateInventorySettings = async (req, res, next) => {
     if (gst_percentage !== undefined) updateData.gst_percentage = gst_percentage;
     if (low_stock_threshold !== undefined) updateData.low_stock_threshold = low_stock_threshold;
 
-    const updated = await settingsService.editGeneralSettings(updateData);
+    const updated = await settingsService.editInventorySettings(updateData);
     
     // If low stock threshold changed, recalculate all inventory statuses
     if (low_stock_threshold !== undefined) {
@@ -136,7 +169,11 @@ export const updateInventorySettings = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: 'Inventory settings updated successfully',
-      data: updated
+      data: {
+        id: updated.id,
+        gst_percentage: updated.gst_percentage,
+        low_stock_threshold: updated.low_stock_threshold
+      }
     });
   } catch (error) {
     next(error);

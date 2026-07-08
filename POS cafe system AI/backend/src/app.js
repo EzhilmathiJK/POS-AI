@@ -11,6 +11,14 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// 1.5 Global JSON Replacer (Strip Metadata)
+app.set('json replacer', (key, value) => {
+  if (['is_deleted', 'created_at', 'updated_at'].includes(key)) {
+    return undefined; // Strips these fields from all responses automatically
+  }
+  return value;
+});
+
 // 2. Logging
 app.use(morgan('dev'));
 

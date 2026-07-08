@@ -39,11 +39,11 @@ const DashboardTopBar = () => {
 
         <div className="flex items-center gap-[12px] cursor-pointer hover:opacity-90 transition-opacity">
           <div className="w-[38px] h-[38px] rounded-full bg-[var(--color-primary)] flex items-center justify-center text-white font-bold text-[13px] uppercase">
-            {currentUser?.full_name ? currentUser.full_name.substring(0, 2) : 'AD'}
+            {currentUser?.fullname ? currentUser.fullname.substring(0, 2) : 'AD'}
           </div>
           <div className="hidden sm:flex flex-col items-start justify-center">
             <p className="text-[14px] font-bold text-[#14142b] leading-[18px] capitalize">{currentUser?.role?.toLowerCase() || 'Admin'}</p>
-            <p className="text-[12px] font-semibold text-[#8a84b3] leading-[16px]">{currentUser?.full_name || 'Administrator'}</p>
+            <p className="text-[12px] font-semibold text-[#8a84b3] leading-[16px]">{currentUser?.fullname || 'Administrator'}</p>
           </div>
           <Icons.ChevronDown className="hidden sm:block text-[14px] text-[#14142b] font-bold" strokeWidth={3} />
         </div>

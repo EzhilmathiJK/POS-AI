@@ -11,6 +11,7 @@ router.get('/general', settingsController.getGeneralSettings);
 
 router.use(authenticate);
 router.get('/categories', settingsController.getCategories);
+router.get('/inventory', settingsController.getInventorySettings);
 
 router.use(authorize('settings'));
 
